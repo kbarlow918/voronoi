@@ -288,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RndPointSet.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -335,6 +339,10 @@
 			>
 			<File
 				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RndPointSet.h"
 				>
 			</File>
 			<File

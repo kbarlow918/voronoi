@@ -4,6 +4,7 @@
 
 #include "StdAfx.h"
 #include "VoronoiPlugIn.h"
+#include "RndPointSet.h"
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -69,12 +70,9 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
 
-  ON_wString wStr;
-  wStr.Format( L"The \"%s\" command is under construction.\n", EnglishCommandName() );
-  if( context.IsInteractive() )
-    RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
-  else
-	  RhinoApp().Print( wStr );
+  RndPointSet mySet;
+  mySet.DrawPoints(context, 1);
+  
 
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.
