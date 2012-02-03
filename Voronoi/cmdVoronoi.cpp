@@ -73,6 +73,18 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
   RndPointSet mySet;
   mySet.DrawPoints(context, 1);
   
+  {
+	CVoronoiDialog *m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
+	{
+		m_dialog->ShowWindow( SW_SHOW );
+		m_dialog->UpdateWindow();
+		m_dialog->SetFocus();
+	}
+  }
+  {
+  }
+	  
 
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.
