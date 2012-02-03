@@ -35,15 +35,14 @@ RHINO_PLUG_IN_VERSION( __DATE__"  "__TIME__ )
 // must be present or your plug-in will not load.
 //
 // When completed, delete the following #error directive.
-#error Developer declarations block is incomplete!
-RHINO_PLUG_IN_DEVELOPER_ORGANIZATION( L"My Company Name" );
-RHINO_PLUG_IN_DEVELOPER_ADDRESS( L"123 Developer Street\r\nCity State 12345-6789" );
-RHINO_PLUG_IN_DEVELOPER_COUNTRY( L"My Country" );
-RHINO_PLUG_IN_DEVELOPER_PHONE( L"123.456.7890" );
-RHINO_PLUG_IN_DEVELOPER_FAX( L"123.456.7891" );
-RHINO_PLUG_IN_DEVELOPER_EMAIL( L"support@mycompany.com" );
-RHINO_PLUG_IN_DEVELOPER_WEBSITE( L"http://www.mycompany.com" );
-RHINO_PLUG_IN_UPDATE_URL( L"http://www.mycompany.com/support" );
+RHINO_PLUG_IN_DEVELOPER_ORGANIZATION( L"Purdue" );
+RHINO_PLUG_IN_DEVELOPER_ADDRESS( L"Lawson Computer Science Building, Purdue University" );
+RHINO_PLUG_IN_DEVELOPER_COUNTRY( L"USA" );
+RHINO_PLUG_IN_DEVELOPER_PHONE( L"n/a" );
+RHINO_PLUG_IN_DEVELOPER_FAX( L"n/a" );
+RHINO_PLUG_IN_DEVELOPER_EMAIL( L"kbarlow@purdue.edu" );
+RHINO_PLUG_IN_DEVELOPER_WEBSITE( L"www.cs.purdue.edu" );
+RHINO_PLUG_IN_UPDATE_URL( L"n/a" );
 
 // The one and only CVoronoiPlugIn object
 static CVoronoiPlugIn thePlugIn;
