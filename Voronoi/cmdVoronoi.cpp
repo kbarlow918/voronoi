@@ -72,9 +72,21 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
   ON_wString wStr;
   wStr.Format( L"The \"%s\" command is under construction.\n", EnglishCommandName() );
   if( context.IsInteractive() )
+  {
+	CVoronoiDialog *m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
+	{
+		m_dialog->ShowWindow( SW_SHOW );
+		m_dialog->UpdateWindow();
+		m_dialog->SetFocus();
+	}
     RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
+  }
   else
+  {
 	  RhinoApp().Print( wStr );
+  }
+	  
 
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.

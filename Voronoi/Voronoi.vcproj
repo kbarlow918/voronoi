@@ -324,6 +324,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VoronoiDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\VoronoiPlugIn.cpp"
 				>
 			</File>
@@ -343,6 +347,10 @@
 			</File>
 			<File
 				RelativePath=".\VoronoiApp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VoronoiDialog.h"
 				>
 			</File>
 			<File
@@ -435,5 +443,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="Voronoi.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

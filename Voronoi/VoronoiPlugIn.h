@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "VoronoiDialog.h"
 /////////////////////////////////////////////////////////////////////////////
 // CVoronoiPlugIn
 // See VoronoiPlugIn.cpp for the implementation of this class
@@ -28,7 +29,7 @@ public:
 
 private:
   ON_wString m_plugin_version;
-
+  CVoronoiDialog* m_dialog;
   // TODO: Add additional class information here
 };
 
