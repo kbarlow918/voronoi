@@ -11,33 +11,58 @@ RndPointSet::~RndPointSet(void)
 
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints )
 {
-  double x = 0.0, y = 0.0;
-  ON_wString sx, sy, sz;
  
-  // Pick a brep to evaluate
+  // Pick a surface to evaluate
   CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select surface or polysurface to evaluate" );
-  go.SetGeometryFilter( CRhinoGetObject::surface_object|CRhinoGetObject::polysrf_object );
+  go.SetCommandPrompt( L"Select surface to evaluate - test" );
+  go.SetGeometryFilter( CRhinoGetObject::surface_object);
   go.GetObjects( 1, 1 );
-  //if( go.CommandResult() != success )
-  //  return go.CommandResult();
+
  
-  // Get the brep geometry
+  // Get the surface geometry
   const CRhinoObjRef& ref = go.Object(0);
-  const ON_Brep* brep = ref.Brep();
-  //if( !brep )
-  //  return failure;
- 
-  const ON_BoundingBox bbox = brep->BoundingBox();
+  const ON_Surface* obj = ref.Surface();
+
+  double u1, u2, v1, v2;
   
-  int i;
-  for(i = 0; i < numPoints; i++)
+  if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(0, &v1, &v2))
   {
-	  ON_3dPoint p0( fRand(bbox.m_min.x, bbox.m_max.x), fRand(bbox.m_min.y, bbox.m_max.y), fRand(bbox.m_min.z, bbox.m_max.z) );
-	  context.m_doc.AddPointObject(p0);
+	  int i;
+	  for(i = 0; i < numPoints; i++)
+	  {
+		  ON_3dPoint p0 = obj->PointAt( fRand(u1, u2), fRand(v1, v2));
+		  double u, v;
+		  obj->GetClosestPoint(p0, &u, &v);
+		  ON_3dPoint p1 = obj->PointAt( u, v);
+
+		  context.m_doc.AddPointObject(p1);
+	  }
+	  context.m_doc.Redraw();
   }
-  context.m_doc.Redraw();
+
  //this is drawing things outside the bounding box for some reason
+}
+
+void RndPointSet::Test( const CRhinoCommandContext& context, double a, double b, double c, double d )
+{
+  // Pick a surface to evaluate
+  CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select surface to evaluate - test function" );
+  go.SetGeometryFilter( CRhinoGetObject::surface_object);
+  go.GetObjects( 1, 1 );
+
+ 
+  // Get the surface geometry
+  const CRhinoObjRef& ref = go.Object(0);
+  const ON_Surface* obj = ref.Surface();
+
+  ON_3dPoint p0 = obj->PointAt( a, b);
+  double u, v;
+  obj->GetClosestPoint(p0, &u, &v);
+  ON_3dPoint p1 = obj->PointAt( u, v);
+
+  context.m_doc.AddPointObject(p1);
+  context.m_doc.Redraw();
 }
 
 double RndPointSet::fRand(double fMin, double fMax)

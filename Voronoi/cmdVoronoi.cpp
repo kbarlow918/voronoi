@@ -71,8 +71,8 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
   // a command-line, or scriptable interface.
 
   RndPointSet mySet;
-  mySet.DrawPoints(context, 1);
-  
+  mySet.DrawPoints(context, 3);
+  /*
   {
 	CVoronoiDialog *m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
 	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
@@ -84,7 +84,7 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
   }
   {
   }
-	  
+	 */ 
 
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.

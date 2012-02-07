@@ -38,6 +38,7 @@
 // CVoronoiApp
 
 BEGIN_MESSAGE_MAP(CVoronoiApp, CWinApp)
+	ON_BN_CLICKED(IDOK, &CVoronoiApp::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,4 +61,10 @@ BOOL CVoronoiApp::InitInstance()
 	CWinApp::InitInstance();
 
 	return TRUE;
+}
+
+void CVoronoiApp::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	
 }
