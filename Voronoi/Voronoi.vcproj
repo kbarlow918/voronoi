@@ -385,68 +385,20 @@
 			Filter="lib"
 			>
 			<File
-				RelativePath="..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs.lib"
+				RelativePath="C:\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs.lib"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs_d.lib"
+				RelativePath="C:\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs_d.lib"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PseudoDebug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4.lib"
+				RelativePath="C:\Program Files\Rhino 4.0 SDK\lib\Rhino4.lib"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4_d.lib"
+				RelativePath="C:\Program Files\Rhino 4.0 SDK\lib\Rhino4_d.lib"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PseudoDebug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
