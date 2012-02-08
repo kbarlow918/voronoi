@@ -29,3 +29,5 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 
 Voronoi.ncb
+Voronoi/Voronoi.vcproj
+.gitignore
