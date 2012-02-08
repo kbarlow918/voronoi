@@ -1,6 +1,0 @@
-; Voronoi.def : Declares the module parameters for the DLL.
-
-; LIBRARY      "Voronoi"
-
-EXPORTS
-    ; Explicit exports can go here
