@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Resource.h"
+#include "afxwin.h"
 // CVoronoiDialog dialog
 
 class CVoronoiDialog : public CRhinoDialog
@@ -21,4 +22,5 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnEnChangeEdit1();
+	CEdit m_editControl;
 };

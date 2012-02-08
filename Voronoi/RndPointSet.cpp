@@ -7,6 +7,7 @@ RndPointSet::RndPointSet(void)
 
 RndPointSet::~RndPointSet(void)
 {
+	
 }
 
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints )
@@ -14,7 +15,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
  
   // Pick a surface to evaluate
   CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select surface to evaluate - test" );
+  go.SetCommandPrompt( L"Select surface to evaluate" );
   go.SetGeometryFilter( CRhinoGetObject::surface_object);
   go.GetObjects( 1, 1 );
 

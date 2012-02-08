@@ -23,6 +23,7 @@ CVoronoiDialog::~CVoronoiDialog()
 void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, m_editControl);
 }
 
 
@@ -37,6 +38,13 @@ END_MESSAGE_MAP()
 void CVoronoiDialog::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
+	ON_wString cmd = L"! _RandomPoint ";
+	CString num;
+	m_editControl.GetWindowText(num);
+	cmd += (LPCTSTR)num;
+
+	//GetWindowText(; 
+	RhinoApp().RunScript( cmd , 0 );
 	OnOK();
 }
 

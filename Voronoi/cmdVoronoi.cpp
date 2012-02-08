@@ -69,11 +69,6 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
 
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
-
-  RndPointSet mySet;
-  mySet.DrawPoints(context, 3);
-  /*
-  {
 	CVoronoiDialog *m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
 	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
 	{
@@ -81,6 +76,10 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
 		m_dialog->UpdateWindow();
 		m_dialog->SetFocus();
 	}
+  
+  /*
+  {
+	
   }
   {
   }
@@ -100,6 +99,53 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
 
 //
 // END Voronoi command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN RandomPoint command
+//
+
+class CCommandRandomPoint : public CRhinoTestCommand
+{
+public:
+	CCommandRandomPoint() {}
+	~CCommandRandomPoint() {}
+	UUID CommandUUID()
+	{
+		// {A3E576E2-7A1F-42F9-8EFE-D0F92B17BAD8}
+		static const GUID RandomPointCommand_UUID =
+		{ 0xA3E576E2, 0x7A1F, 0x42F9, { 0x8E, 0xFE, 0xD0, 0xF9, 0x2B, 0x17, 0xBA, 0xD8 } };
+		return RandomPointCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"RandomPoint"; }
+	const wchar_t* LocalCommandName() { return L"RandomPoint"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandRandomPoint object
+static class CCommandRandomPoint theRandomPointCommand;
+
+CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContext& context )
+{
+	
+	CRhinoGetNumber gn;
+  gn.SetDefaultNumber( 1 ) ;
+  gn.AcceptNothing();
+  gn.GetNumber();
+  int rc = gn.CommandResult();
+	
+  RndPointSet mySet;
+  mySet.DrawPoints(context, (int) gn.Number());
+  return CRhinoCommand::success;
+}
+
+//
+// END RandomPoint command
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
