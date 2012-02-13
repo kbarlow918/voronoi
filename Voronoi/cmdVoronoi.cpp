@@ -141,6 +141,7 @@ CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContex
 	
   RndPointSet mySet;
   mySet.DrawPoints(context, (int) gn.Number());
+
   return CRhinoCommand::success;
 }
 

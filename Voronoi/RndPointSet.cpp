@@ -10,6 +10,37 @@ RndPointSet::~RndPointSet(void)
 	
 }
 
+void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double value )
+{
+  // Pick a surface to evaluate
+  CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select surface where attractor will be added" );
+  go.SetGeometryFilter( CRhinoGetObject::surface_object);
+  go.GetObjects( 1, 1 );
+ 
+  // Get the surface geometry
+  const ON_Surface* ref = go.Object(0).Surface();
+
+  if(ref == NULL)
+  {
+	RhinoApp().Print(L"reference initialization error");
+	return ;
+  }
+
+  CRhinoGetPoint getPoint;
+  getPoint.SetCommandPrompt( L"Select point on the surface" );
+  getPoint.Constrain( *ref ); //force point to be on surface
+  if(getPoint.GetPoint( ) == CRhinoGet::point) //did it work?
+  {
+	  ON_3dPoint attractor = getPoint.Point();
+
+	  //draw the point and add it to the attractors list
+	  PointAttractor pa(attractor, value, context.m_doc.AddPointObject(attractor));
+	  pointAttractors.push_back(pa);
+	  context.m_doc.Redraw();
+  }
+}
+
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints )
 {
  
@@ -53,9 +84,14 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 		  ON_3dPoint p1 = obj->PointAt( u, v);
-		  
 		  context.m_doc.AddPointObject(p1);
 	  }
+
+	  for(i = 0; i < pointAttractors.size(); i++)
+	  {
+		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
+	  }
+
 	  context.m_doc.Redraw();
   }
   else
