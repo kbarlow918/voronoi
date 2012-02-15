@@ -72,6 +72,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
   if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(1, &v1, &v2))
   {
 	  int i;
+	  ON_3dPoint prev;
 	  for(i = 0; i < numPoints; i++)
 	  {
 		  ON_3dPoint p0 = obj->PointAt( fRand(u1, u2), fRand(v1, v2));
@@ -84,6 +85,23 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 		  ON_3dPoint p1 = obj->PointAt( u, v);
+		  //code to make lines between points
+		  /*if(i>0)
+		  {
+			  ON_LineCurve l0 = ON_LineCurve(p1, prev);
+			  ON_3dVector v0 = ON_3dVector(0,0,1);
+			  ON_SimpleArray<ON_Curve*> arr;
+			  ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
+			  if(arr.First() == NULL)
+			  {
+				RhinoApp().Print(L"no projection");
+			  }else
+			  {
+				context.m_doc.AddCurveObject(**arr.First());
+			  }
+			  
+		  }
+		  prev = p1;*/
 		  context.m_doc.AddPointObject(p1);
 	  }
 
@@ -128,4 +146,47 @@ double RndPointSet::fRand(double fMin, double fMax)
 {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
+}
+
+/*
+Description:
+  Projects a curve onto a surface or polysurface
+Parameters:
+  brep  - [in] The brep to project the curve onto.
+  curve - [in] The curve to project.
+  dir   - [in] The direction of the projection.
+  tol   - [in] The intersection tolerance.
+  output_curves - [out] The output curves. 
+                        NOTE, the caller is responsible 
+                        for destroying these curves.
+Returns:
+  true if successful.
+  false if unsuccessful.
+*/
+bool RndPointSet::ProjectCurveToBrep(
+        const ON_Brep& brep, 
+        const ON_Curve& curve, 
+        const ON_3dVector& dir, 
+        double tolerance,
+        ON_SimpleArray<ON_Curve*>& output_curves
+        )
+{
+  ON_3dVector n = dir;
+  if( !n.Unitize() ) 
+    return false;
+ 
+  ON_BoundingBox bbox = brep.BoundingBox();
+  bbox.Union( curve.BoundingBox() );
+ 
+  ON_Surface* pExtrusion = RhinoExtrudeCurveStraight( &curve, dir, bbox.Diagonal().Length() );
+  if( 0 == pExtrusion )
+    return false;
+ 
+  ON_Brep* pBrep = ON_Brep::New();
+  pBrep->Create( pExtrusion );
+ 
+  BOOL rc = RhinoIntersectBreps( *pBrep, brep, tolerance, output_curves );
+  delete pBrep; // Don't leak...
+ 
+  return ( rc ) ? true : false;
 }

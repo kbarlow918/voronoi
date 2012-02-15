@@ -23,6 +23,13 @@ public:
 	void DrawPoints( const CRhinoCommandContext& context, int numPoints );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	double fRand(double fMin, double fMax);
+	bool ProjectCurveToBrep(
+        const ON_Brep& brep, 
+        const ON_Curve& curve, 
+        const ON_3dVector& dir, 
+        double tolerance,
+        ON_SimpleArray<ON_Curve*>& output_curves
+        );
 
 private:
 	std::vector<PointAttractor> pointAttractors;
