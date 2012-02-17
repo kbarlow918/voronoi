@@ -9,13 +9,14 @@ public:
 	double GetScore(double u, double v);
 
 	CRhinoPointObject* pointObj;
-
+	double strength;
 
 private:
 	ON_3dPoint point;
-	double strength;
+
 	const ON_Surface* surface;
 	double maxDist;
+	double myU, myV;
 
 	void SetMaxDist();
 };

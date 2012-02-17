@@ -21,4 +21,5 @@ public:
 
 private:
 	std::vector<PointAttractor> pointAttractors;
+	std::vector<CRhinoPointObject*> points;
 };
