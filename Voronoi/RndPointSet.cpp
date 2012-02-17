@@ -35,9 +35,11 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
 	  ON_3dPoint attractor = getPoint.Point();
 
 	  //draw the point and add it to the attractors list
-	  PointAttractor pa(attractor, value, context.m_doc.AddPointObject(attractor));
+	  PointAttractor pa(attractor, value, context.m_doc.AddPointObject(attractor), ref);
 	  pointAttractors.push_back(pa);
 	  context.m_doc.Redraw();
+
+	  pa.GetScore(0, 0);
   }
 }
 
@@ -71,6 +73,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 
   if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(1, &v1, &v2))
   {
+	  RhinoApp().Print("Domain U: %f  %f   V: %f  %f", u1, u2, v1, v2);
 	  int i;
 	  ON_3dPoint prev;
 	  for(i = 0; i < numPoints; i++)
@@ -82,8 +85,8 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 		  //RhinoApp().Print(L"p0.z = %f\n",p0.z);
 		  double u, v = 0.0;						//the following might be redundant
 		  obj->GetClosestPoint(p0, &u, &v);			
-		  //RhinoApp().Print(L"p0.u = %f\n",u);
-		  //RhinoApp().Print(L"p0.v = %f\n",v);
+		  RhinoApp().Print(L"p0.u = %f\n",u);
+		  RhinoApp().Print(L"p0.v = %f\n",v);
 		  ON_3dPoint p1 = obj->PointAt( u, v);
 		  //code to make lines between points
 		  /*if(i>0)

@@ -140,7 +140,8 @@ CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContex
   int rc = gn.CommandResult();
 	
   RndPointSet mySet;
-  mySet.DrawPoints(context, (int) gn.Number());
+  mySet.AddPointAttractor(context, 1.0);
+  //mySet.DrawPoints(context, (int) gn.Number());
 
   return CRhinoCommand::success;
 }
