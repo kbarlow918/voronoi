@@ -328,6 +328,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VoronoiDiagramGenerator.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\VoronoiDialog.cpp"
 				>
 			</File>
@@ -355,6 +359,10 @@
 			</File>
 			<File
 				RelativePath=".\VoronoiApp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VoronoiDiagramGenerator.h"
 				>
 			</File>
 			<File

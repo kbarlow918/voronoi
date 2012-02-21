@@ -1,6 +1,10 @@
 #include "StdAfx.h"
 #include "RndPointSet.h"
+#include "VoronoiDiagramGenerator.h"
 
+float *xValues;
+float *yValues;
+int vsize = 0;
 RndPointSet::RndPointSet(void)
 {
 }
@@ -41,6 +45,25 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
   }
 }
 
+void RndPointSet::RunVoronoi()
+{
+	  VoronoiDiagramGenerator vdg;
+	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.01);
+
+	  vdg.resetIterator();
+
+	  float x1,y1,x2,y2;
+
+	  RhinoApp().Print(L"\n-------------------------------\n");
+	  while(vdg.getNext(x1,y1,x2,y2))
+	  {
+		RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
+		
+	  }
+	  delete(xValues);
+	  delete(yValues);
+}
+
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints )
 {
  
@@ -49,7 +72,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
   go.SetCommandPrompt( L"Select surface to evaluate " );
   go.SetGeometryFilter( CRhinoGetObject::surface_object);
   go.GetObjects( 1, 1 );
- 
+  vsize = numPoints;
   // Get the surface geometry
   const CRhinoObjRef& ref = go.Object(0);
 
@@ -71,6 +94,8 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 
   if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(1, &v1, &v2))
   {
+	  xValues = new float[numPoints];
+	  yValues = new float[numPoints];
 	  int i;
 	  for(i = 0; i < numPoints; i++)
 	  {
@@ -80,19 +105,22 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 		  //RhinoApp().Print(L"p0.y = %f\n",p0.y);
 		  //RhinoApp().Print(L"p0.z = %f\n",p0.z);
 		  double u, v = 0.0;						//the following might be redundant
-		  obj->GetClosestPoint(p0, &u, &v);			
+		  obj->GetClosestPoint(p0, &u, &v);	
+		  xValues[i] = (float)(u);
+		  yValues[i] = (float)(v);
+		  RhinoApp().Print(L"adding: %f,%f\n",(float)u,(float)v);
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 		  ON_3dPoint p1 = obj->PointAt( u, v);
 		  context.m_doc.AddPointObject(p1);
 	  }
-
+	  RunVoronoi();
 	  for(i = 0; i < pointAttractors.size(); i++)
 	  {
 		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
 	  }
 
-	  context.m_doc.Redraw();
+	  context.m_doc.Redraw();	  
   }
   else
   {
