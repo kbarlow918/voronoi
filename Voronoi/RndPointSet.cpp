@@ -7,7 +7,7 @@ float *yValues;
 int vsize = 0;
 RndPointSet::RndPointSet(void)
 {
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 }
 
 RndPointSet::~RndPointSet(void)
@@ -124,10 +124,10 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 			  //RhinoApp().Print(L"p0.y = %f\n",p0.y);
 			  //RhinoApp().Print(L"p0.z = %f\n",p0.z);
 			  double u, v = 0.0;						//the following might be redundant
-		  obj->GetClosestPoint(p0, &u, &v);	
-		  xValues[i] = (float)(u);
-		  yValues[i] = (float)(v);
-		  RhinoApp().Print(L"adding: %f,%f\n",(float)u,(float)v);
+			  obj->GetClosestPoint(p0, &u, &v);	
+			  xValues[i] = (float)(u);
+			  yValues[i] = (float)(v);
+			  RhinoApp().Print(L" adding: %f,%f\n",(float)u,(float)v);
 			  //RhinoApp().Print(L"p0.u = %f\n",u);
 			  //RhinoApp().Print(L"p0.v = %f\n",v);
 			  p1 = obj->PointAt( u, v);

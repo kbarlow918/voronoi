@@ -46,6 +46,8 @@ public:
     return VoronoiCommand_UUID;
 	}
 
+	RndPointSet mySet;
+
   // Returns the English command name.
 	const wchar_t* EnglishCommandName() { return L"Voronoi"; }
 
@@ -133,22 +135,65 @@ static class CCommandRandomPoint theRandomPointCommand;
 CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContext& context )
 {
 	
-	CRhinoGetNumber gn;
+  CRhinoGetNumber gn;
   gn.SetDefaultNumber( 1 ) ;
   gn.AcceptNothing();
   gn.GetNumber();
   int rc = gn.CommandResult();
 	
-  RndPointSet mySet;
-  //mySet.AddPointAttractor(context, 10.0);
-  //mySet.DrawPoints(context, (int) 75);
-  mySet.DrawPoints(context, (int) gn.Number());
+  theVoronoiCommand.mySet.DrawPoints(context, (int) gn.Number());
 
   return CRhinoCommand::success;
 }
 
 //
 // END RandomPoint command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN AddPtAttractor command
+//
+
+class CCommandAddPtAttractor : public CRhinoCommand
+{
+public:
+	CCommandAddPtAttractor() {}
+	~CCommandAddPtAttractor() {}
+	UUID CommandUUID()
+	{
+		// {7C0AE2D0-65F6-4677-B1EA-334A94B38C49}
+		static const GUID AddPtAttractorCommand_UUID =
+		{ 0x7C0AE2D0, 0x65F6, 0x4677, { 0xB1, 0xEA, 0x33, 0x4A, 0x94, 0xB3, 0x8C, 0x49 } };
+		return AddPtAttractorCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"AddPtAttractor"; }
+	const wchar_t* LocalCommandName() { return L"AddPtAttractor"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandAddPtAttractor object
+static class CCommandAddPtAttractor theAddPtAttractorCommand;
+
+CRhinoCommand::result CCommandAddPtAttractor::RunCommand( const CRhinoCommandContext& context )
+{
+	  CRhinoGetNumber gn;
+	  gn.SetDefaultNumber( 1.0 ) ;
+	  gn.AcceptNothing();
+	  gn.GetNumber();
+	  double rc = gn.CommandResult();
+		
+	  RndPointSet mySet;
+	  theVoronoiCommand.mySet.AddPointAttractor(context, gn.Number());
+
+	return CRhinoCommand::success;
+}
+
+//
+// END AddPtAttractor command
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

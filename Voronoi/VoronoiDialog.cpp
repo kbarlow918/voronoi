@@ -24,12 +24,14 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, m_editControl);
+	DDX_Control(pDX, IDC_STRENGTH, m_editStrength);
 }
 
 
 BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDOK, &CVoronoiDialog::OnBnClickedOk)
 	ON_EN_CHANGE(IDC_EDIT1, &CVoronoiDialog::OnEnChangeEdit1)
+	ON_BN_CLICKED(IDC_BUTTON1, &CVoronoiDialog::OnBnClickedAddAttractor)
 END_MESSAGE_MAP()
 
 
@@ -56,4 +58,16 @@ void CVoronoiDialog::OnEnChangeEdit1()
 	// with the ENM_CHANGE flag ORed into the mask.
 
 	// TODO:  Add your control notification handler code here
+}
+
+void CVoronoiDialog::OnBnClickedAddAttractor()
+{
+	// TODO: Add your control notification handler code here
+	ON_wString cmd = L"! _AddPtAttractor ";
+	CString num;
+	m_editStrength.GetWindowText(num);
+	cmd += (LPCTSTR)num;
+
+	//GetWindowText(; 
+	RhinoApp().RunScript( cmd , 0 );
 }
