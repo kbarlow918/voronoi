@@ -46,21 +46,43 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
   }
 }
 
-void RndPointSet::RunVoronoi()
+void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj)
 {
-	  VoronoiDiagramGenerator vdg;
-	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.01);
-
-	  vdg.resetIterator();
-
 	  float x1,y1,x2,y2;
+	  ON_3dPoint p1;
+	  ON_3dPoint p2;
+	  VoronoiDiagramGenerator vdg;
 
+	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.0001); //the user needs to be able to decide these values
+	  vdg.resetIterator();
+	
 	  RhinoApp().Print(L"\n-------------------------------\n");
 	  while(vdg.getNext(x1,y1,x2,y2))
 	  {
 		RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
-		
+		//start drawing edge
+		p1 = obj->PointAt( x1, y1);
+		p2 = obj->PointAt( x2, y2);
+		ON_LineCurve l0 = ON_LineCurve(p1, p2);
+		ON_3dVector v0 = ON_3dVector(0,0,1);
+		ON_SimpleArray<ON_Curve*> arr;
+		ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
+
+		if(arr.First() == NULL)
+		{
+			v0 = ON_3dVector(0,0,-1);
+			ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
+			if(arr.First() == NULL)
+			{
+				RhinoApp().Print(L"no projection"); //ideally this should never actually print I believe this is the cause of the gaps
+			}
+		}
+		else
+		{
+			context.m_doc.AddCurveObject(**arr.First());
+		}
 	  }
+	  //context.m_doc.Redraw();
 	  delete(xValues);
 	  delete(yValues);
 }
@@ -185,7 +207,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 		  }
 		  context.m_doc.AddPointObject(p1);
 	  }
-	  RunVoronoi();
+	  RunVoronoi(context, obj);
 	  for(i = 0; i < pointAttractors.size(); i++)
 	  {
 		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
