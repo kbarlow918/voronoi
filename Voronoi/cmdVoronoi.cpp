@@ -194,8 +194,7 @@ CRhinoCommand::result CCommandAddPtAttractor::RunCommand( const CRhinoCommandCon
 	  gn.AcceptNothing();
 	  gn.GetNumber();
 	  double rc = gn.CommandResult();
-		
-	  RndPointSet mySet;
+
 	  theVoronoiCommand.mySet.AddPointAttractor(context, gn.Number());
 
 	return CRhinoCommand::success;
@@ -203,6 +202,45 @@ CRhinoCommand::result CCommandAddPtAttractor::RunCommand( const CRhinoCommandCon
 
 //
 // END AddPtAttractor command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN DelPtAttractor command
+//
+
+class CCommandDelPtAttractor : public CRhinoCommand
+{
+public:
+	CCommandDelPtAttractor() {}
+	~CCommandDelPtAttractor() {}
+	UUID CommandUUID()
+	{
+		// {4EDD85D0-D2E1-41B2-B09B-29B18206FE11}
+		static const GUID DelPtAttractorCommand_UUID =
+		{ 0x4EDD85D0, 0xD2E1, 0x41B2, { 0xB0, 0x9B, 0x29, 0xB1, 0x82, 0x06, 0xFE, 0x11 } };
+		return DelPtAttractorCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"DelPtAttractor"; }
+	const wchar_t* LocalCommandName() { return L"DelPtAttractor"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandDelPtAttractor object
+static class CCommandDelPtAttractor theDelPtAttractorCommand;
+
+CRhinoCommand::result CCommandDelPtAttractor::RunCommand( const CRhinoCommandContext& context )
+{
+    theVoronoiCommand.mySet.DeletePointAttractor(context);
+
+	return CRhinoCommand::success;
+}
+
+//
+// END DelPtAttractor command
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

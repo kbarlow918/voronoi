@@ -32,6 +32,7 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDOK, &CVoronoiDialog::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_BUTTON1, &CVoronoiDialog::OnBnClickedAddAttractor)
+	ON_BN_CLICKED(IDC_DELATTRACTOR, &CVoronoiDialog::OnBnClickedDelattractor)
 END_MESSAGE_MAP()
 
 
@@ -62,5 +63,12 @@ void CVoronoiDialog::OnBnClickedAddAttractor()
 	cmd += (LPCTSTR)num;
 
 	//GetWindowText(; 
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedDelattractor()
+{
+	ON_wString cmd = L"! _DelPtAttractor ";
+
 	RhinoApp().RunScript( cmd , 0 );
 }

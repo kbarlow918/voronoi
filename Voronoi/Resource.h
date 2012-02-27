@@ -5,9 +5,10 @@
 #define IDD_DIALOG1                     3000
 #define IDC_BUTTON1                     3000
 #define IDC_EDIT1                       3001
-#define IDC_OVRSTR                      3002
 #define IDC_OVERALLSTRENGTH             3002
 #define IDC_STRENGTH                    3003
+#define IDC_BUTTON2                     3004
+#define IDC_DELATTRACTOR                3004
 
 // Next default values for new objects
 // 

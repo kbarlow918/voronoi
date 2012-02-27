@@ -46,6 +46,36 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
   }
 }
 
+void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
+{
+  CRhinoGetPoint getPoint;
+
+  //add current attractors as snap points (doesn't help)
+  /*
+  int j;
+  for(j = 0; j < pointAttractors.size(); j++)
+  {
+	  getPoint.AddSnapPoint(pointAttractors.at(j).point);
+  }
+  getPoint.PermitObjectSnap(true);
+  */
+
+  getPoint.SetCommandPrompt( L"Select attractor to delete" );
+  if(getPoint.GetPoint( ) == CRhinoGet::point) //did it work?
+  {
+	  ON_3dPoint attractor = getPoint.Point();
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  int j;
+	  for(j = 0; j < pointAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(pointAttractors.at(j).point == attractor)
+			  pointAttractors.at(j).pointObj->DeleteFromDocNotification();
+	  }
+	  context.m_doc.Redraw();
+  }
+}
+
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj)
 {
 	  float x1,y1,x2,y2;
@@ -113,6 +143,22 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
   }
 	
   double u1, u2, v1, v2, minStrength;
+
+  if(pointAttractors.size() > 0)
+  {
+	  //removed deleted attractors
+	  int j;
+	  for(j = 1; j < pointAttractors.size(); j++)
+	  {
+		  if(pointAttractors.at(j).pointObj->IsDeleted())
+		  {
+			  RhinoApp().Print("\nErasing deleted attractor");
+			  pointAttractors.erase(pointAttractors.begin() + j);
+		  }
+	  }
+	  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
+  }
+
 
   if(pointAttractors.size() > 0)
   {

@@ -25,4 +25,5 @@ public:
 	afx_msg void OnBnClickedAddAttractor();
 	CEdit m_editStrength;
 	CEdit m_editOverallStrength;
+	afx_msg void OnBnClickedDelattractor();
 };
