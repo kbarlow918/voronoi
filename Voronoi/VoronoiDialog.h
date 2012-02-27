@@ -26,4 +26,5 @@ public:
 	CEdit m_editStrength;
 	CEdit m_editOverallStrength;
 	afx_msg void OnBnClickedDelattractor();
+	afx_msg void OnBnClickedAddcurve();
 };

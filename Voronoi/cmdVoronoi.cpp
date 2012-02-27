@@ -244,3 +244,48 @@ CRhinoCommand::result CCommandDelPtAttractor::RunCommand( const CRhinoCommandCon
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN AddCurveAttractor command
+//
+
+class CCommandAddCurveAttractor : public CRhinoCommand
+{
+public:
+	CCommandAddCurveAttractor() {}
+	~CCommandAddCurveAttractor() {}
+	UUID CommandUUID()
+	{
+		// {8312D0D1-31FA-4DF8-BA0F-8FCEED8AA0D8}
+		static const GUID AddCurveAttractorCommand_UUID =
+		{ 0x8312D0D1, 0x31FA, 0x4DF8, { 0xBA, 0x0F, 0x8F, 0xCE, 0xED, 0x8A, 0xA0, 0xD8 } };
+		return AddCurveAttractorCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"AddCurveAttractor"; }
+	const wchar_t* LocalCommandName() { return L"AddCurveAttractor"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandAddCurveAttractor object
+static class CCommandAddCurveAttractor theAddCurveAttractorCommand;
+
+CRhinoCommand::result CCommandAddCurveAttractor::RunCommand( const CRhinoCommandContext& context )
+{
+	  CRhinoGetNumber gn;
+	  gn.SetDefaultNumber( 1.0 ) ;
+	  gn.AcceptNothing();
+	  gn.GetNumber();
+	  double rc = gn.CommandResult();
+
+	  theVoronoiCommand.mySet.AddCurveAttractor(context, gn.Number());
+
+	return CRhinoCommand::success;
+}
+
+//
+// END AddCurveAttractor command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////

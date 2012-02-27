@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDOK, &CVoronoiDialog::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_BUTTON1, &CVoronoiDialog::OnBnClickedAddAttractor)
 	ON_BN_CLICKED(IDC_DELATTRACTOR, &CVoronoiDialog::OnBnClickedDelattractor)
+	ON_BN_CLICKED(IDC_ADDCURVE, &CVoronoiDialog::OnBnClickedAddcurve)
 END_MESSAGE_MAP()
 
 
@@ -69,6 +70,16 @@ void CVoronoiDialog::OnBnClickedAddAttractor()
 void CVoronoiDialog::OnBnClickedDelattractor()
 {
 	ON_wString cmd = L"! _DelPtAttractor ";
+
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedAddcurve()
+{
+	ON_wString cmd = L"! _AddCurveAttractor ";
+	CString num;
+	m_editStrength.GetWindowText(num);
+	cmd += (LPCTSTR)num;
 
 	RhinoApp().RunScript( cmd , 0 );
 }

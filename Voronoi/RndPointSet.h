@@ -9,6 +9,7 @@ public:
 	~RndPointSet(void);
 	void RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj);
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
+	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );

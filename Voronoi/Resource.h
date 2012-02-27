@@ -7,8 +7,9 @@
 #define IDC_EDIT1                       3001
 #define IDC_OVERALLSTRENGTH             3002
 #define IDC_STRENGTH                    3003
-#define IDC_BUTTON2                     3004
 #define IDC_DELATTRACTOR                3004
+#define IDC_BUTTON2                     3005
+#define IDC_ADDCURVE                    3005
 
 // Next default values for new objects
 // 

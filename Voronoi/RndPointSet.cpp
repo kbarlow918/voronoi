@@ -46,6 +46,23 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
   }
 }
 
+void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double value )
+{
+  CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select curve" );
+  go.SetGeometryFilter( CRhinoGetObject::curve_object);
+  go.GetObjects( 1, 1 );
+
+  // Get the curve
+  const ON_Curve* ref = go.Object(0).Curve();
+
+  if(ref == NULL)
+  {
+	RhinoApp().Print(L"reference initialization error");
+	return ;
+  }
+}
+
 void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
 {
   CRhinoGetPoint getPoint;
