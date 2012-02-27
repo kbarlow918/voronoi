@@ -140,9 +140,18 @@ CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContex
   gn.AcceptNothing();
   gn.GetNumber();
   int rc = gn.CommandResult();
-	
-  theVoronoiCommand.mySet.DrawPoints(context, (int) gn.Number());
 
+  CRhinoGetNumber gn2;
+  gn2.SetDefaultNumber( 1.0 ) ;
+  gn2.AcceptNothing();
+  gn2.GetNumber();
+  double rc2 = gn2.CommandResult();
+	
+  int arg1 = (int) gn.Number();
+  double arg2 = gn2.Number(); 
+
+  theVoronoiCommand.mySet.DrawPoints(context, arg1, arg2);
+  //RhinoApp().Print("drawpoints with %d %f\n", arg1, arg2);
   return CRhinoCommand::success;
 }
 

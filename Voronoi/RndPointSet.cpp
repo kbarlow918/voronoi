@@ -87,9 +87,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  delete(yValues);
 }
 
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints )
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints, double maxExponent )
 {
- 
   // Pick a surface to evaluate
   CRhinoGetObject go;
   go.SetCommandPrompt( L"Select surface to evaluate " );
@@ -187,8 +186,12 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 					  totalMultOfMinStrength += minStrengthMult;
 				  }
 
-				  double stayChance = totalScore/totalMultOfMinStrength;
-				  double rolled = fRand(0, 1);
+				  //double smallExponent = (totalScore/totalMultOfMinStrength)*maxExponent;
+				  //double stayChance = (exp(smallExponent)/exp(maxExponent));
+				  double stayChance = (totalScore/totalMultOfMinStrength);
+				  //double rolled = fRand(0, 1);
+
+				  double rolled = 1/exp((1-fRand(0, 1))*maxExponent);
 				  RhinoApp().Print("\nChance to stay: %f Rolled: %f", stayChance, rolled);
 				  if(rolled > stayChance)
 				  {

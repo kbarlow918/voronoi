@@ -21,8 +21,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnEnChangeEdit1();
 	CEdit m_editControl;
 	afx_msg void OnBnClickedAddAttractor();
 	CEdit m_editStrength;
+	CEdit m_editOverallStrength;
 };
