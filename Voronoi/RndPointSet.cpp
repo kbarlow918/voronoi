@@ -53,7 +53,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
 
-	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.0001); //the user needs to be able to decide these values
+	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.000001); //the user needs to be able to decide these values
 	  vdg.resetIterator();
 	
 	  RhinoApp().Print(L"\n-------------------------------\n");
