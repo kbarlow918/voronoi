@@ -48,18 +48,37 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
 
 void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double value )
 {
+  // Pick a surface to evaluate
   CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select surface where attractor will be added" );
+  go.SetGeometryFilter( CRhinoGetObject::surface_object);
+  go.GetObjects( 1, 1 );
+ 
+  // Get the surface geometry
+  const ON_Surface* surf = go.Object(0).Surface();
+
+  if(surf == NULL)
+  {
+	RhinoApp().Print(L"reference initialization error");
+	return ;
+  }
+
   go.SetCommandPrompt( L"Select curve" );
   go.SetGeometryFilter( CRhinoGetObject::curve_object);
   go.GetObjects( 1, 1 );
 
   // Get the curve
   const ON_Curve* ref = go.Object(0).Curve();
-
   if(ref == NULL)
   {
 	RhinoApp().Print(L"reference initialization error");
 	return ;
+  }
+  else
+  {
+	CurveAttractor ca(ref, value, surf);
+	curveAttractors.push_back(ca);
+	context.m_doc.Redraw();
   }
 }
 
@@ -82,7 +101,7 @@ void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
   {
 	  ON_3dPoint attractor = getPoint.Point();
 	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
-	  int j;
+	  unsigned int j;
 	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
@@ -134,7 +153,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  delete(yValues);
 }
 
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints, double maxExponent )
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
 {
   // Pick a surface to evaluate
   CRhinoGetObject go;
@@ -160,11 +179,15 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
   }
 	
   double u1, u2, v1, v2, minStrength;
+  minStrength = NULL;
 
+
+  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
+  RhinoApp().Print("\nErase check");
   if(pointAttractors.size() > 0)
   {
 	  //removed deleted attractors
-	  int j;
+	  unsigned int j;
 	  for(j = 1; j < pointAttractors.size(); j++)
 	  {
 		  if(pointAttractors.at(j).pointObj->IsDeleted())
@@ -173,48 +196,66 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 			  pointAttractors.erase(pointAttractors.begin() + j);
 		  }
 	  }
-	  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
   }
-
+  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
 
   if(pointAttractors.size() > 0)
   {
 	  //find the attractor with the least strength (magnitude)
-	  int j;
+	  unsigned int j;
 	  minStrength = abs(pointAttractors.at(0).strength);
 	  for(j = 1; j < pointAttractors.size(); j++)
 	  {
 		  if(abs(pointAttractors.at(j).strength) < minStrength)
 			  minStrength = abs(pointAttractors.at(j).strength);
 	  }
-	  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
   }
+  RhinoApp().Print("\nStarting curve min");
+  if(curveAttractors.size() > 0)
+  {
+	  //find the attractor with the least strength (magnitude)
+	  unsigned int j;
+	  if(minStrength == NULL)
+	  {
+		RhinoApp().Print("\nNo point attractors - min str was null");
+		minStrength = abs(curveAttractors.at(0).strength);
+	  }
+	  for(j = 0; j < curveAttractors.size(); j++)
+	  {
+		  RhinoApp().Print("\nFinding curve min");
+		  if(abs(curveAttractors.at(j).strength) < minStrength)
+			  minStrength = abs(curveAttractors.at(j).strength);
+	  }
+  }
+
+  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
 
   if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(1, &v1, &v2))
   {
 	  xValues = new float[numPoints];
 	  yValues = new float[numPoints];
-	  int i;
+	  unsigned int i;
 	  ON_3dPoint prev;
 	  for(i = 0; i < numPoints; i++)
 	  {
 		  bool redo = true; //used to redo due to attractors
-		  ON_3dPoint p1;
+		  ON_3dPoint p0;
 		  while(redo)
 		  {
-			  ON_3dPoint p0 = obj->PointAt( fRand(u1, u2), fRand(v1, v2));
+			  double u, v = 0.0;
+			  p0 = obj->PointAt( u = fRand(u1, u2), v = fRand(v1, v2));
 			  //context.m_doc.AddPointObject(p0); 
-			  //RhinoApp().Print(L"p0.x = %f\n",p0.x);
-			  //RhinoApp().Print(L"p0.y = %f\n",p0.y);
-			  //RhinoApp().Print(L"p0.z = %f\n",p0.z);
-			  double u, v = 0.0;						//the following might be redundant
-			  obj->GetClosestPoint(p0, &u, &v);	
+			  //RhinoApp().Print(L"p0.x = %f ",p0.x);
+			  //RhinoApp().Print(L"p0.y = %f ",p0.y);
+			  //RhinoApp().Print(L"p0.z = %f ",p0.z);
+			  //RhinoApp().Print(L"p0.u = %f ",u);
+			  //RhinoApp().Print(L"p0.v = %f ",v);
+
 			  xValues[i] = (float)(u);
 			  yValues[i] = (float)(v);
-			  RhinoApp().Print(L" adding: %f,%f\n",(float)u,(float)v);
+			  RhinoApp().Print(L" \n adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
 			  //RhinoApp().Print(L"p0.u = %f\n",u);
 			  //RhinoApp().Print(L"p0.v = %f\n",v);
-			  p1 = obj->PointAt( u, v);
 			  //code to make lines between points
 			  /*if(i>0)
 			  {
@@ -234,17 +275,26 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 			  prev = p1;*/
 
 			  //deal with attractors
-			  if(pointAttractors.size() > 0)
+			  if(pointAttractors.size() + curveAttractors.size() > 0)
 			  {
 				  double totalScore = 0.0;
 				  double totalMultOfMinStrength = 0.0;
-				  int j;
+				  unsigned int j;
 				  for(j = 0; j < pointAttractors.size(); j++)
 				  {
 					  double score = pointAttractors.at(j).GetScore(u,v);
 					  //How many times stronger than the weakest is this attractor?
 					  double minStrengthMult = abs(pointAttractors.at(j).strength)/minStrength;
-					  RhinoApp().Print("\nPoint %f %f Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
+					  RhinoApp().Print("\nPoint %f %f Point Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
+					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
+					  totalMultOfMinStrength += minStrengthMult;
+				  }
+				  for(j = 0; j < curveAttractors.size(); j++)
+				  {
+					  double score = curveAttractors.at(j).GetScore(u,v, p0);
+					  //How many times stronger than the weakest is this attractor?
+					  double minStrengthMult = abs(curveAttractors.at(j).strength)/minStrength;
+					  RhinoApp().Print("\nPoint %f %f Curve Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
 					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
 					  totalMultOfMinStrength += minStrengthMult;
 				  }
@@ -271,7 +321,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, int numPoints
 				  redo = false;
 			  }
 		  }
-		  context.m_doc.AddPointObject(p1);
+		  context.m_doc.AddPointObject(p0);
 	  }
 	  RunVoronoi(context, obj);
 	  for(i = 0; i < pointAttractors.size(); i++)

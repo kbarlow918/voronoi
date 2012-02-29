@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "PointAttractor.h"
+#include "CurveAttractor.h"
 
 class RndPointSet
 {
@@ -11,7 +12,7 @@ public:
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void DeletePointAttractor( const CRhinoCommandContext& context );
-	void DrawPoints( const CRhinoCommandContext& context, int numPoints, double maxExponent );
+	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	double fRand(double fMin, double fMax);
 	bool ProjectCurveToBrep(
@@ -25,4 +26,5 @@ public:
 private:
 	std::vector<PointAttractor> pointAttractors;
 	std::vector<CRhinoPointObject*> points;
+	std::vector<CurveAttractor> curveAttractors;
 };

@@ -13,7 +13,6 @@ public:
 	ON_3dPoint point;
 
 private:
-	
 	const ON_Surface* surface;
 	double maxDist;
 	double myU, myV;
