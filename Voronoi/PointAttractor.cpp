@@ -30,7 +30,7 @@ void PointAttractor::SetMaxDist()
 		RhinoApp().Print("Domain U: %f  %f   V: %f  %f", u1, u2, v1, v2);
 
 		//Get the UV representation of the chosen attractor
-		if(surface->GetClosestPoint(pointObj->Point(), &myU, &myV))
+		if(surface->GetClosestPoint(point, &myU, &myV))
 		{
 			RhinoApp().Print("\nGot UV: %f %f", myU, myV);
 
