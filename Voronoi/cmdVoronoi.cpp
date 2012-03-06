@@ -289,3 +289,41 @@ CRhinoCommand::result CCommandAddCurveAttractor::RunCommand( const CRhinoCommand
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN ClearAll command
+//
+
+class CCommandClearAll : public CRhinoCommand
+{
+public:
+	CCommandClearAll() {}
+	~CCommandClearAll() {}
+	UUID CommandUUID()
+	{
+		// {152EAA63-2BDC-4B58-8B25-AD4C615F5644}
+		static const GUID ClearAllCommand_UUID =
+		{ 0x152EAA63, 0x2BDC, 0x4B58, { 0x8B, 0x25, 0xAD, 0x4C, 0x61, 0x5F, 0x56, 0x44 } };
+		return ClearAllCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"ClearAll"; }
+	const wchar_t* LocalCommandName() { return L"ClearAll"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandClearAll object
+static class CCommandClearAll theClearAllCommand;
+
+CRhinoCommand::result CCommandClearAll::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.ClearAll(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END ClearAll command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////

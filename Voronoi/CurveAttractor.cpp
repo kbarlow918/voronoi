@@ -6,11 +6,12 @@ CurveAttractor::CurveAttractor(void)
 {
 }
 
-CurveAttractor::CurveAttractor(const ON_Curve* aCurve, double aStrength, const ON_Surface* aSurface)
+CurveAttractor::CurveAttractor(const ON_Curve* aCurve, double aStrength, const ON_Surface* aSurface, CRhinoObjRef aObjRef)
 {
 	strength = aStrength;
 	curveObj = aCurve;
 	surface = aSurface;
+	objRef = aObjRef;
 }
 
 CurveAttractor::~CurveAttractor(void)

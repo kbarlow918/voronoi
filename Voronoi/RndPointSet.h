@@ -14,6 +14,7 @@ public:
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
+	void ClearAll(const CRhinoCommandContext& context);
 	double fRand(double fMin, double fMax);
 	bool ProjectCurveToBrep(
         const ON_Brep& brep, 
@@ -27,4 +28,5 @@ private:
 	std::vector<PointAttractor> pointAttractors;
 	std::vector<CRhinoPointObject*> points;
 	std::vector<CurveAttractor> curveAttractors;
+	std::vector<CRhinoCurveObject*> surfaceCurves;
 };

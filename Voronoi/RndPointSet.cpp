@@ -76,7 +76,7 @@ void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double
   }
   else
   {
-	CurveAttractor ca(ref, value, surf);
+	CurveAttractor ca(ref, value, surf, go.Object(0));
 	curveAttractors.push_back(ca);
 	context.m_doc.Redraw();
   }
@@ -106,7 +106,11 @@ void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
 		  if(pointAttractors.at(j).point == attractor)
-			  pointAttractors.at(j).pointObj->DeleteFromDocNotification();
+		  {
+			  context.m_doc.DeleteObject(pointAttractors.at(j).pointObj);
+			  pointAttractors.erase(pointAttractors.begin() + j);
+			  break;
+		  }
 	  }
 	  context.m_doc.Redraw();
   }
@@ -145,7 +149,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		}
 		else
 		{
-			context.m_doc.AddCurveObject(**arr.First());
+			surfaceCurves.push_back(context.m_doc.AddCurveObject(**arr.First()));
 		}
 	  }
 	  //context.m_doc.Redraw();
@@ -321,12 +325,16 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 				  redo = false;
 			  }
 		  }
-		  context.m_doc.AddPointObject(p0);
+		  points.push_back(context.m_doc.AddPointObject(p0));
 	  }
 	  RunVoronoi(context, obj);
 	  for(i = 0; i < pointAttractors.size(); i++)
 	  {
 		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
+	  }
+	  for(i = 0; i < curveAttractors.size(); i++)
+	  {
+		  context.m_doc.DeleteObject(curveAttractors.at(i).objRef);
 	  }
 
 	  context.m_doc.Redraw();	  
@@ -337,6 +345,37 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	return ;
   }
 
+}
+
+void RndPointSet::ClearAll(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < pointAttractors.size(); i++)
+	{
+	  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
+	}
+	for(i = 0; i < curveAttractors.size(); i++)
+	{
+	  context.m_doc.DeleteObject(curveAttractors.at(i).objRef);
+	}
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.DeleteObject(points.at(i));
+	}
+	for(i = 0; i < surfaceCurves.size(); i++)
+	{
+	  context.m_doc.DeleteObject(surfaceCurves.at(i));
+	}
+
+	pointAttractors.clear();
+	curveAttractors.clear();
+	points.clear();
+	surfaceCurves.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nData cleared");
 }
 
 void RndPointSet::Test( const CRhinoCommandContext& context, double a, double b, double c, double d )
