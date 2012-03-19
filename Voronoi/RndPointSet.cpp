@@ -122,8 +122,10 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
-
-	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.0001); //the user needs to be able to decide these values
+	  double umin, umax, vmin, vmax;
+	  obj->GetDomain(0, &umin, &umax);
+	  obj->GetDomain(1, &vmin, &vmax);
+	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,.0001); //the user needs to be able to decide these values
 	  vdg.resetIterator();
 	  
 	  RhinoApp().Print(L"\n-------------------------------\n");
