@@ -5,6 +5,8 @@
 float *xValues;
 float *yValues;
 int vsize = 0;
+int currentCenter = 0;
+std::vector<ON_SimpleArray<ON_2dPoint>> rndPoints;
 RndPointSet::RndPointSet(void)
 {
 	srand((unsigned int)time(NULL));
@@ -128,11 +130,15 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  obj->GetDomain(1, &vmin, &vmax);
 	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,.0001); //the user needs to be able to decide these values
 	  vdg.resetIterator();
-	  
+	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
+	  for(int i=0; i<vsize; i++)
+	  {
+		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
+	  }
 	  RhinoApp().Print(L"\n-------------------------------\n");
 	  while(vdg.getNext(x1,y1,x2,y2))
 	  {
-		RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
+		//RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
 		
 		//start drawing edge
 		//old code, trying to replace with RhinoInterpolatePointsOnSurface
@@ -169,25 +175,91 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
 		if(item != NULL)
 		{
-			surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+			//surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
 		}else
 		{
 			RhinoApp().Print(L"no projection");
 		}
+
+		//search for closest points
+		 
+		ON_2dPoint midpoint = ON_2dPoint( (x1 + x2) / 2, (y1+ y2) / 2 );
+		//ON_2dPoint side1, side2;
+		double dist1 = DBL_MAX, dist2 = DBL_MAX, currdist;
+		int point1 =0, point2 =0;
+		//RhinoApp().Print(L"HERE2");
+		for(int i=0; i<vsize; i++)
+		{
+			
+			currdist = sqrt(pow((xValues[i] - midpoint.x), 2) + pow((yValues[i] - midpoint.y), 2));
+			if(currdist < dist1)
+			{
+				point2 = point1;
+				dist2 = dist1;
+				dist1 = currdist;
+				point1 = i;
+			}else if(currdist < dist2)
+			{
+				point2 = i;
+				dist2 = currdist;
+			}else
+			{
+
+			}
+		}
+		ON_2dPoint offsetPoint = ON_2dPoint( (midpoint.x + xValues[point1])/2, (midpoint.y + yValues[point1])/2);
+		rndPoints.at(point1).Append(offsetPoint);
+		offsetPoint = ON_2dPoint( (midpoint.x + xValues[point2])/2, (midpoint.y + yValues[point2])/2);
+		rndPoints.at(point2).Append(offsetPoint);
 		
+	  }
+	  //RhinoApp().Print(L"HERE");
+	  //draw trim curves
+	  for(int i=0; i<vsize; i++)
+      {
+			currentCenter = i;
+			rndPoints.at(i).QuickSort(&sortPoints);
+			//rndPoints.at(i).QuickSort(ON_CompareIncreasing);
+			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .01, 0);
+			if(item != NULL)
+			{
+				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+			}else
+			{
+				RhinoApp().Print(L"no projection");
+			}
 	  }
 	  //context.m_doc.Redraw();
 	  int i = 0;
-	  for(i; i<(int)cellBorderList.size();i++)
+	  /*for(i; i<(int)cellBorderList.size();i++)
 	  {
 			cb = cellBorderList.at(i);
 			cb.findConnected(cellBorderList);
 	  }
-	  RhinoApp().Print(L"Found connected subsets");
+	  RhinoApp().Print(L"Found connected subsets");*/
 	  delete(xValues);
 	  delete(yValues);
 }
+int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
+{
+	if (p1->x >= 0 && p2->x < 0)
+        return 1;
+    if (p1->x == 0 && p2->x == 0)
+        return p1->y > p2->y;
 
+    // compute the cross product of vectors (center -> a) x (center -> b)
+    float det = (p1->x-xValues[currentCenter]) * (p2->y - yValues[currentCenter]) - (p2->x - xValues[currentCenter]) * (p1->y - yValues[currentCenter]);
+    if (det < 0)
+        return 1;
+    if (det > 0)
+        return -1;
+
+    // points a and b are on the same line from the center
+    // check which point is closer to the center
+    int d1 = (p1->x-xValues[currentCenter]) * (p1->x-xValues[currentCenter]) + (p1->y-yValues[currentCenter]) * (p1->y-yValues[currentCenter]);
+    int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
+    return d1 > d2;
+}
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
 {
   // Pick a surface to evaluate

@@ -17,6 +17,7 @@ public:
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	void ClearAll(const CRhinoCommandContext& context);
 	double fRand(double fMin, double fMax);
+	
 	bool ProjectCurveToBrep(
         const ON_Brep& brep, 
         const ON_Curve& curve, 
@@ -32,3 +33,5 @@ private:
 	std::vector<CRhinoCurveObject*> surfaceCurves;
 	
 };
+
+int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2);
