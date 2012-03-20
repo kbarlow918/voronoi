@@ -2,6 +2,7 @@
 #include <vector>
 #include "PointAttractor.h"
 #include "CurveAttractor.h"
+#include "CellBorder.h"
 
 class RndPointSet
 {
@@ -23,10 +24,11 @@ public:
         double tolerance,
         ON_SimpleArray<ON_Curve*>& output_curves
         );
-
+	std::vector<CellBorder> cellBorderList;
 private:
 	std::vector<PointAttractor> pointAttractors;
 	std::vector<CRhinoPointObject*> points;
 	std::vector<CurveAttractor> curveAttractors;
 	std::vector<CRhinoCurveObject*> surfaceCurves;
+	
 };

@@ -122,6 +122,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
+	  CellBorder cb;
 	  double umin, umax, vmin, vmax;
 	  obj->GetDomain(0, &umin, &umax);
 	  obj->GetDomain(1, &vmin, &vmax);
@@ -132,6 +133,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  while(vdg.getNext(x1,y1,x2,y2))
 	  {
 		RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
+		
 		//start drawing edge
 		//old code, trying to replace with RhinoInterpolatePointsOnSurface
 
@@ -158,9 +160,12 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		ON_SimpleArray<ON_2dPoint> pointArr;
 		ON_2dPoint first = ON_2dPoint(x1,y1);
 		ON_2dPoint second = ON_2dPoint(x2,y2);
+		cb = CellBorder(first, second);
+
 		pointArr.Append(first);
-		pointArr.Append(second);
-		
+		pointArr.Append(second);		
+		cellBorderList.push_back(cb);
+
 		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
 		if(item != NULL)
 		{
@@ -172,6 +177,13 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		
 	  }
 	  //context.m_doc.Redraw();
+	  int i = 0;
+	  for(i; i<(int)cellBorderList.size();i++)
+	  {
+			cb = cellBorderList.at(i);
+			cb.findConnected(cellBorderList);
+	  }
+	  RhinoApp().Print(L"Found connected subsets");
 	  delete(xValues);
 	  delete(yValues);
 }
