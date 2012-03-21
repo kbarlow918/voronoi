@@ -327,3 +327,41 @@ CRhinoCommand::result CCommandClearAll::RunCommand( const CRhinoCommandContext& 
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN ViewEdit command
+//
+
+class CCommandViewEdit : public CRhinoCommand
+{
+public:
+	CCommandViewEdit() {}
+	~CCommandViewEdit() {}
+	UUID CommandUUID()
+	{
+		// {667D2C97-63BB-4889-A00A-5CFEC7D84778}
+		static const GUID ViewEditCommand_UUID =
+		{ 0x667D2C97, 0x63BB, 0x4889, { 0xA0, 0x0A, 0x5C, 0xFE, 0xC7, 0xD8, 0x47, 0x78 } };
+		return ViewEditCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"ViewEdit"; }
+	const wchar_t* LocalCommandName() { return L"ViewEdit"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandViewEdit object
+static class CCommandViewEdit theViewEditCommand;
+
+CRhinoCommand::result CCommandViewEdit::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.ViewEdit(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END ViewEdit command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////

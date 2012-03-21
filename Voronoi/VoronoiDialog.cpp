@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_DELATTRACTOR, &CVoronoiDialog::OnBnClickedDelattractor)
 	ON_BN_CLICKED(IDC_ADDCURVE, &CVoronoiDialog::OnBnClickedAddcurve)
 	ON_BN_CLICKED(IDCLEAR, &CVoronoiDialog::OnBnClickedClear)
+	ON_BN_CLICKED(IDC_VIEWEDIT, &CVoronoiDialog::OnBnClickedViewedit)
 END_MESSAGE_MAP()
 
 
@@ -88,6 +89,13 @@ void CVoronoiDialog::OnBnClickedAddcurve()
 void CVoronoiDialog::OnBnClickedClear()
 {
 	ON_wString cmd = L"! _ClearAll ";
+
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedViewedit()
+{
+	ON_wString cmd = L"! _ViewEdit ";
 
 	RhinoApp().RunScript( cmd , 0 );
 }

@@ -9,8 +9,9 @@
 #define IDC_STRENGTH                    3003
 #define IDC_DELATTRACTOR                3004
 #define IDC_ADDCURVE                    3005
-#define IDC                             3006
 #define IDCLEAR                         3006
+#define IDC_DELATTRACTOR2               3007
+#define IDC_VIEWEDIT                    3007
 
 // Next default values for new objects
 // 

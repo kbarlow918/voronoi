@@ -86,35 +86,133 @@ void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double
 
 void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
 {
-  CRhinoGetPoint getPoint;
+  CRhinoGetObject getPoint;
 
-  //add current attractors as snap points (doesn't help)
-  /*
-  int j;
-  for(j = 0; j < pointAttractors.size(); j++)
-  {
-	  getPoint.AddSnapPoint(pointAttractors.at(j).point);
-  }
-  getPoint.PermitObjectSnap(true);
-  */
+  const ON_Point* ptAttractor;
+  const ON_Curve* curveAttractor;
 
   getPoint.SetCommandPrompt( L"Select attractor to delete" );
-  if(getPoint.GetPoint( ) == CRhinoGet::point) //did it work?
+  getPoint.GetObjects(1,1);
+  if((ptAttractor = getPoint.Object(0).Point()) != NULL) //did it work?
   {
-	  ON_3dPoint attractor = getPoint.Point();
+	  //RhinoApp().Print("got point\n");
 	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
 	  unsigned int j;
 	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
-		  if(pointAttractors.at(j).point == attractor)
+		  if(pointAttractors.at(j).point == ptAttractor->point)
 		  {
 			  context.m_doc.DeleteObject(pointAttractors.at(j).pointObj);
 			  pointAttractors.erase(pointAttractors.begin() + j);
-			  break;
+			  context.m_doc.Redraw();
+			  RhinoApp().Print("Attractor deleted\n");
+			  return;
+		  }
+	  }	  
+  }
+  else if((curveAttractor = getPoint.Object(0).Curve()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got curve\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < curveAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(curveAttractors.at(j).curveObj == curveAttractor)
+		  {
+			  context.m_doc.DeleteObject(curveAttractors.at(j).objRef);
+			  curveAttractors.erase(curveAttractors.begin() + j);
+			  context.m_doc.Redraw();
+			  RhinoApp().Print("Attractor deleted\n");
+			  return;
 		  }
 	  }
-	  context.m_doc.Redraw();
+  }
+  else
+  {
+	RhinoApp().Print("No valid attractor in that selection\n");
+  }
+}
+
+void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
+{
+  CRhinoGetObject getPoint;
+
+  const ON_Point* ptAttractor;
+  const ON_Curve* curveAttractor;
+
+  getPoint.SetCommandPrompt( L"Select attractor to view and edit" );
+  getPoint.GetObjects(1,1);
+  if((ptAttractor = getPoint.Object(0).Point()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got point\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < pointAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(pointAttractors.at(j).point == ptAttractor->point)
+		  {
+			  RhinoApp().Print("Point #%d: x %.2f y %.2f z %.2f Current strength: %f\n", j, pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z, pointAttractors.at(j).strength);
+
+			  CRhinoGetString getNumber;
+			  double newStrength = NULL;
+
+			  getNumber.SetCommandPrompt( L"Enter new attractor value, or leave blank to keep current value" );
+			  getNumber.AcceptNothing();
+			  if(getNumber.GetString() == CRhinoGetString::nothing)
+			  {
+				RhinoApp().Print("Value unchanged\n");
+				return;
+			  }
+			  newStrength = _wtof(getNumber.String());
+
+			  if(newStrength != NULL)
+			  {
+				pointAttractors.at(j).strength = newStrength;
+				RhinoApp().Print("Strength set to %f\n", pointAttractors.at(j).strength);
+			  }
+			  return;
+		  }
+	  }
+  }
+  else if((curveAttractor = getPoint.Object(0).Curve()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got curve\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < curveAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(curveAttractors.at(j).curveObj == curveAttractor)
+		  {
+			  RhinoApp().Print("Curve #%d: Current strength: %f\n", j, curveAttractors.at(j).strength);
+
+			  CRhinoGetString getNumber;
+			  double newStrength = NULL;
+
+			  getNumber.SetCommandPrompt( L"Enter new attractor value, or leave blank to keep current value" );
+			  getNumber.AcceptNothing();
+			  if(getNumber.GetString() == CRhinoGetString::nothing)
+			  {
+				RhinoApp().Print("Value unchanged\n");
+				return;
+			  }
+			  newStrength = _wtof(getNumber.String());
+
+			  if(newStrength != NULL)
+			  {
+				curveAttractors.at(j).strength = newStrength;
+				RhinoApp().Print("Strength set to %f\n", curveAttractors.at(j).strength);
+			  }
+			  return;
+		  }
+	  }
+  }
+  else
+  {
+	RhinoApp().Print("No valid attractor in that selection\n");
   }
 }
 
