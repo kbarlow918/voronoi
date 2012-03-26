@@ -27,7 +27,7 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
  
   // Get the surface geometry
   const ON_Surface* ref = go.Object(0).Surface();
-
+  
   if(ref == NULL)
   {
 	RhinoApp().Print(L"reference initialization error");
@@ -569,6 +569,8 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	  context.m_doc.DeleteObject(surfaceCurves.at(i));
 	}
 
+	rndPoints.clear();
+	cellBorderList.clear();
 	pointAttractors.clear();
 	curveAttractors.clear();
 	points.clear();
