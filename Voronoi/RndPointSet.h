@@ -9,12 +9,12 @@ class RndPointSet
 public:
 	RndPointSet(void);
 	~RndPointSet(void);
-	void RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj);
+	void RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj, bool drawCellLines);
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void ViewEdit( const CRhinoCommandContext& context );
-	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
+	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent, bool drawCellLines );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	void ClearAll(const CRhinoCommandContext& context);
 	double fRand(double fMin, double fMax);

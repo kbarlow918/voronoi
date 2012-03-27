@@ -216,7 +216,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
   }
 }
 
-void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj)
+void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj, bool drawCellLines)
 {
 	  float x1,y1,x2,y2;
 	  ON_3dPoint p1;
@@ -271,9 +271,9 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		cellBorderList.push_back(cb);
 
 		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
-		if(item != NULL)
+		if(item != NULL && drawCellLines)//draw the cells
 		{
-			//surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+			surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
 		}else
 		{
 			RhinoApp().Print(L"no projection");
@@ -358,7 +358,7 @@ int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
     int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
     return d1 > d2;
 }
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent, bool drawCellLines )
 {
   // Pick a surface to evaluate
   CRhinoGetObject go;
@@ -528,7 +528,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 		  }
 		  points.push_back(context.m_doc.AddPointObject(p0));
 	  }
-	  RunVoronoi(context, obj);
+	  RunVoronoi(context, obj, drawCellLines);
 	  for(i = 0; i < pointAttractors.size(); i++)
 	  {
 		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);

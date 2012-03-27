@@ -13,7 +13,7 @@ IMPLEMENT_DYNAMIC(CVoronoiDialog, CDialog)
 CVoronoiDialog::CVoronoiDialog(CWnd* pParent /*=NULL*/)
 	: CRhinoDialog(CVoronoiDialog::IDD, pParent)
 {
-	
+
 }
 
 CVoronoiDialog::~CVoronoiDialog()
@@ -26,6 +26,7 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, m_editControl);
 	DDX_Control(pDX, IDC_STRENGTH, m_editStrength);
 	DDX_Control(pDX, IDC_OVERALLSTRENGTH, m_editOverallStrength);
+	DDX_Control(pDX, IDC_CELL_LINES, CellLines);
 }
 
 
@@ -51,6 +52,11 @@ void CVoronoiDialog::OnBnClickedOk()
 	cmd += (LPCTSTR)" ";
 	m_editOverallStrength.GetWindowText(num);
 	cmd += (LPCTSTR)num;
+	cmd += (LPCTSTR)" ";
+	if(CellLines.GetState())
+		cmd += (LPCTSTR)"1";
+	else
+		cmd += (LPCTSTR)"0";
 
 	//GetWindowText(; 
 	RhinoApp().RunScript( cmd , 0 );
