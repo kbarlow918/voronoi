@@ -44,7 +44,6 @@ END_MESSAGE_MAP()
 
 void CVoronoiDialog::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
 	ON_wString cmd = L"! _RandomPoint ";
 	CString num;
 	m_editControl.GetWindowText(num);
@@ -58,9 +57,7 @@ void CVoronoiDialog::OnBnClickedOk()
 	else
 		cmd += (LPCTSTR)"0";
 
-	//GetWindowText(; 
 	RhinoApp().RunScript( cmd , 0 );
-	OnOK();
 }
 
 void CVoronoiDialog::OnBnClickedAddAttractor()
