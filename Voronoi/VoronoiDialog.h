@@ -30,4 +30,6 @@ public:
 	afx_msg void OnBnClickedClear();
 	afx_msg void OnBnClickedViewedit();
 	CButton CellLines;
+	afx_msg void OnBnClickedCellGenerate();
+	afx_msg void OnBnClickedShowhide();
 };

@@ -37,6 +37,8 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_ADDCURVE, &CVoronoiDialog::OnBnClickedAddcurve)
 	ON_BN_CLICKED(IDCLEAR, &CVoronoiDialog::OnBnClickedClear)
 	ON_BN_CLICKED(IDC_VIEWEDIT, &CVoronoiDialog::OnBnClickedViewedit)
+	ON_BN_CLICKED(IDC_CELL_GENERATE, &CVoronoiDialog::OnBnClickedCellGenerate)
+	ON_BN_CLICKED(IDC_SHOWHIDE, &CVoronoiDialog::OnBnClickedShowhide)
 END_MESSAGE_MAP()
 
 
@@ -51,11 +53,6 @@ void CVoronoiDialog::OnBnClickedOk()
 	cmd += (LPCTSTR)" ";
 	m_editOverallStrength.GetWindowText(num);
 	cmd += (LPCTSTR)num;
-	cmd += (LPCTSTR)" ";
-	if(CellLines.GetState())
-		cmd += (LPCTSTR)"1";
-	else
-		cmd += (LPCTSTR)"0";
 
 	RhinoApp().RunScript( cmd , 0 );
 }
@@ -99,6 +96,28 @@ void CVoronoiDialog::OnBnClickedClear()
 void CVoronoiDialog::OnBnClickedViewedit()
 {
 	ON_wString cmd = L"! _ViewEdit ";
+
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedCellGenerate()
+{
+	ON_wString cmd = L"! _RunVoronoi ";
+	if(CellLines.GetState())
+		cmd += (LPCTSTR)"1";
+	else
+		cmd += (LPCTSTR)"0";
+
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedShowhide()
+{
+	ON_wString cmd = L"! _TogglePtHide ";
+	if(CellLines.GetState())
+		cmd += (LPCTSTR)"1";
+	else
+		cmd += (LPCTSTR)"0";
 
 	RhinoApp().RunScript( cmd , 0 );
 }

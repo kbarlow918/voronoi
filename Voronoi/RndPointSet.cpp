@@ -10,6 +10,8 @@ std::vector<ON_SimpleArray<ON_2dPoint>> rndPoints;
 RndPointSet::RndPointSet(void)
 {
 	srand((unsigned int)time(NULL));
+	pointsHidden = true;
+	surface = NULL;
 }
 
 RndPointSet::~RndPointSet(void)
@@ -216,8 +218,9 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
   }
 }
 
-void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj, bool drawCellLines)
+void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
 {
+	  const ON_Surface* obj = surface;
 	  float x1,y1,x2,y2;
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
@@ -271,9 +274,12 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 		cellBorderList.push_back(cb);
 
 		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
-		if(item != NULL && drawCellLines)//draw the cells
+		if(item != NULL)//draw the cells
 		{
-			surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+			CRhinoCurveObject* temp = context.m_doc.AddCurveObject(*item);
+			cellLines.push_back(temp);
+			if(!drawCellLines)
+				context.m_doc.HideObject(temp);
 		}else
 		{
 			RhinoApp().Print(L"no projection");
@@ -337,6 +343,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surfa
 	  RhinoApp().Print(L"Found connected subsets");*/
 	  delete(xValues);
 	  delete(yValues);
+	  context.m_doc.Redraw();
 }
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 {
@@ -358,7 +365,7 @@ int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
     int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
     return d1 > d2;
 }
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent, bool drawCellLines )
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
 {
   // Pick a surface to evaluate
   CRhinoGetObject go;
@@ -383,6 +390,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	return ;
   }
 	
+  surface = obj;
   double u1, u2, v1, v2, minStrength;
   minStrength = NULL;
 
@@ -528,7 +536,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 		  }
 		  points.push_back(context.m_doc.AddPointObject(p0));
 	  }
-	  RunVoronoi(context, obj, drawCellLines);
+
 	  for(i = 0; i < pointAttractors.size(); i++)
 	  {
 		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
@@ -538,7 +546,8 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 		  context.m_doc.DeleteObject(curveAttractors.at(i).objRef);
 	  }
 
-	  context.m_doc.Redraw();	  
+	  context.m_doc.Redraw();
+	  pointsHidden = false;
   }
   else
   {
@@ -546,6 +555,42 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	return ;
   }
 
+}
+
+void RndPointSet::ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines)
+{
+	unsigned int i;
+	if(pointsHidden)
+	{
+	  pointsHidden = false;
+	  RhinoApp().Print(L"Points/lines displayed\n");
+	  for(i = 0; i < points.size(); i++)
+	  {
+		  context.m_doc.ShowObject(points.at(i));
+
+	  }
+	  if(drawCellLines)
+	  {
+		  for(i = 0; i<cellLines.size(); i++)
+		  {
+			  context.m_doc.ShowObject(cellLines.at(i));
+		  }
+	  }
+	}
+	else
+	{
+	  pointsHidden = true;
+	  RhinoApp().Print(L"Points/lines hidden\n");
+	  for(i = 0; i < points.size(); i++)
+	  {
+		  context.m_doc.HideObject(points.at(i));
+	  }
+	  for(i = 0; i<cellLines.size(); i++)
+	  {
+		  context.m_doc.HideObject(cellLines.at(i));
+	  }
+	}
+	context.m_doc.Redraw();
 }
 
 void RndPointSet::ClearAll(const CRhinoCommandContext& context)
@@ -564,6 +609,10 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	{
 	  context.m_doc.DeleteObject(points.at(i));
 	}
+	for(i = 0; i < cellLines.size(); i++)
+	{
+	  context.m_doc.DeleteObject(cellLines.at(i));
+	}
 	for(i = 0; i < surfaceCurves.size(); i++)
 	{
 	  context.m_doc.DeleteObject(surfaceCurves.at(i));
@@ -574,7 +623,7 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	pointAttractors.clear();
 	curveAttractors.clear();
 	points.clear();
-	surfaceCurves.clear();
+	cellLines.clear();
 
 	context.m_doc.Redraw();
 

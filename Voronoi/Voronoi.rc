@@ -124,7 +124,7 @@ BEGIN
     DEFPUSHBUTTON   "Clear Points",IDC_CLEAR_POINTS,109,139,50,14
     GROUPBOX        "Voronoi Generation",IDC_STATIC,205,11,172,86
     EDITTEXT        IDC_VORONOI_MIN_DIST,330,23,27,13,ES_AUTOHSCROLL
-    LTEXT           "Ignore points closer than:",IDC_STATIC,214,25,90,12
+    LTEXT           "Ignore points closer than:",IDC_STATIC,215,25,90,12
     EDITTEXT        IDC_INNER_CURVES,330,39,27,13,ES_AUTOHSCROLL
     LTEXT           "Inner curve offset:",IDC_STATIC,215,41,90,12
     DEFPUSHBUTTON   "Generate",IDC_CELL_GENERATE,213,76,50,14

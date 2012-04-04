@@ -146,18 +146,11 @@ CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContex
   gn2.AcceptNothing();
   gn2.GetNumber();
   double rc2 = gn2.CommandResult();
-
-  CRhinoGetNumber gn3;
-  gn3.SetDefaultNumber( 0 ) ;
-  gn3.AcceptNothing();
-  gn3.GetNumber();
-  int rc3 = gn3.CommandResult();
 	
   int arg1 = (int) gn.Number();
   double arg2 = gn2.Number();
-  bool arg3 = (bool)gn3.Number();
 
-  theVoronoiCommand.mySet.DrawPoints(context, arg1, arg2, arg3);
+  theVoronoiCommand.mySet.DrawPoints(context, arg1, arg2);
   //RhinoApp().Print("drawpoints with %d %f\n", arg1, arg2);
   return CRhinoCommand::success;
 }
@@ -369,6 +362,96 @@ CRhinoCommand::result CCommandViewEdit::RunCommand( const CRhinoCommandContext& 
 
 //
 // END ViewEdit command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN RunVoronoi command
+//
+
+class CCommandRunVoronoi : public CRhinoCommand
+{
+public:
+	CCommandRunVoronoi() {}
+	~CCommandRunVoronoi() {}
+	UUID CommandUUID()
+	{
+		// {FC648232-1B09-49E2-B670-D926CED020D0}
+		static const GUID RunVoronoiCommand_UUID =
+		{ 0xFC648232, 0x1B09, 0x49E2, { 0xB6, 0x70, 0xD9, 0x26, 0xCE, 0xD0, 0x20, 0xD0 } };
+		return RunVoronoiCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"RunVoronoi"; }
+	const wchar_t* LocalCommandName() { return L"RunVoronoi"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandRunVoronoi object
+static class CCommandRunVoronoi theRunVoronoiCommand;
+
+CRhinoCommand::result CCommandRunVoronoi::RunCommand( const CRhinoCommandContext& context )
+{
+  CRhinoGetNumber gn3;
+  gn3.SetDefaultNumber( 0 ) ;
+  gn3.AcceptNothing();
+  gn3.GetNumber();
+  int rc3 = gn3.CommandResult();
+	
+  bool arg3 = (bool)gn3.Number();
+
+  theVoronoiCommand.mySet.RunVoronoi(context, arg3);
+  return CRhinoCommand::success;
+}
+
+//
+// END RunVoronoi command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN TogglePtHide command
+//
+
+class CCommandTogglePtHide : public CRhinoCommand
+{
+public:
+	CCommandTogglePtHide() {}
+	~CCommandTogglePtHide() {}
+	UUID CommandUUID()
+	{
+		// {88E8DF07-2DBC-4AE8-8A13-356DB628F6E5}
+		static const GUID TogglePtHideCommand_UUID =
+		{ 0x88E8DF07, 0x2DBC, 0x4AE8, { 0x8A, 0x13, 0x35, 0x6D, 0xB6, 0x28, 0xF6, 0xE5 } };
+		return TogglePtHideCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"TogglePtHide"; }
+	const wchar_t* LocalCommandName() { return L"TogglePtHide"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandTogglePtHide object
+static class CCommandTogglePtHide theTogglePtHideCommand;
+
+CRhinoCommand::result CCommandTogglePtHide::RunCommand( const CRhinoCommandContext& context )
+{
+	  CRhinoGetNumber gn3;
+	  gn3.SetDefaultNumber( 0 ) ;
+	  gn3.AcceptNothing();
+	  gn3.GetNumber();
+	  int rc3 = gn3.CommandResult();
+		
+	  bool arg3 = (bool)gn3.Number();
+
+	theVoronoiCommand.mySet.ToggleHidePoints(context, arg3);
+	return CRhinoCommand::success;
+}
+
+//
+// END TogglePtHide command
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

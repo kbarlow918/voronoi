@@ -9,14 +9,15 @@ class RndPointSet
 public:
 	RndPointSet(void);
 	~RndPointSet(void);
-	void RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj, bool drawCellLines);
+	void RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines);
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void ViewEdit( const CRhinoCommandContext& context );
-	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent, bool drawCellLines );
+	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	void ClearAll(const CRhinoCommandContext& context);
+	void ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines);
 	double fRand(double fMin, double fMax);
 	
 	bool ProjectCurveToBrep(
@@ -32,7 +33,10 @@ private:
 	std::vector<CRhinoPointObject*> points;
 	std::vector<CurveAttractor> curveAttractors;
 	std::vector<CRhinoCurveObject*> surfaceCurves;
+	std::vector<CRhinoCurveObject*> cellLines;
 	std::vector<CellBorder> cellBorderList;
+	bool pointsHidden;
+	const ON_Surface* surface;
 	
 };
 
