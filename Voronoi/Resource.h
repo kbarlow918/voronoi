@@ -23,6 +23,11 @@
 #define IDC_HELP                        3009
 #define IDC_VORONOI_MIN_DIST            3010
 #define IDC_INNER_CURVES                3011
+#define IDC_AttractorStrengthLabel      3014
+#define IDC_NumPointsLabel              3015
+#define IDC_OverallStrengthLabel        3016
+#define IDC_MinDistLabel                3017
+#define IDC_CurveOffsetLabel            3018
 
 // Next default values for new objects
 // 
@@ -30,7 +35,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        3002
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         3014
+#define _APS_NEXT_CONTROL_VALUE         3019
 #define _APS_NEXT_SYMED_VALUE           3000
 #endif
 #endif
