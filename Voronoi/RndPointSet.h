@@ -12,11 +12,14 @@ public:
 	void RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines);
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
+	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void ViewEdit( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	void ClearAll(const CRhinoCommandContext& context);
+	void UndoCurves(const CRhinoCommandContext& context);
+	void UndoPoints(const CRhinoCommandContext& context);
 	void ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines);
 	double fRand(double fMin, double fMax);
 	

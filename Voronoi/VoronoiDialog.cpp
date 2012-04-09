@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "VoronoiApp.h"
 #include "VoronoiDialog.h"
-
+#include "VoronoiPlugIn.h"
 
 // CVoronoiDialog dialog
 
@@ -66,6 +66,10 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_VIEWEDIT, &CVoronoiDialog::OnBnClickedViewedit)
 	ON_BN_CLICKED(IDC_CELL_GENERATE, &CVoronoiDialog::OnBnClickedCellGenerate)
 	ON_BN_CLICKED(IDC_SHOWHIDE, &CVoronoiDialog::OnBnClickedShowhide)
+	ON_BN_CLICKED(IDC_UNDO_CURVES, &CVoronoiDialog::OnBnClickedUndoCurves)
+	ON_BN_CLICKED(IDC_CLEAR_POINTS, &CVoronoiDialog::OnBnClickedClearPoints)
+	ON_BN_CLICKED(IDC_BURN, &CVoronoiDialog::OnBnClickedBurn)
+	ON_BN_CLICKED(IDC_HELP, &CVoronoiDialog::OnBnClickedHelp)
 END_MESSAGE_MAP()
 
 
@@ -220,5 +224,31 @@ void CVoronoiDialog::OnBnClickedShowhide()
 	else
 		cmd += (LPCTSTR)"0";
 
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedUndoCurves()
+{
+	ON_wString cmd = L"! _UndoCurves ";
+	RhinoApp().RunScript( cmd , 0 );
+	SetState(VORONOI_GENERATION);
+}
+
+void CVoronoiDialog::OnBnClickedClearPoints()
+{
+	ON_wString cmd = L"! _UndoPoints ";
+	RhinoApp().RunScript( cmd , 0 );
+	SetState(POINT_GENERATION);
+}
+
+void CVoronoiDialog::OnBnClickedBurn()
+{
+	ON_wString cmd = L"! _BurnData ";
+	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnBnClickedHelp()
+{
+	ON_wString cmd = L"! _HelpDlg ";
 	RhinoApp().RunScript( cmd , 0 );
 }

@@ -12,7 +12,9 @@
 #define IDC_BUTTON1                     3000
 #define IDC_EDIT1                       3001
 #define IDC_OVERALLSTRENGTH             3002
+#define IDD_HELP_DLG                    3002
 #define IDC_STRENGTH                    3003
+#define IDD_DIALOG2                     3003
 #define IDC_DELATTRACTOR                3004
 #define IDC_ADDCURVE                    3005
 #define IDCLEAR                         3006
@@ -23,6 +25,7 @@
 #define IDC_HELP                        3009
 #define IDC_VORONOI_MIN_DIST            3010
 #define IDC_INNER_CURVES                3011
+#define IDC_BURN                        3012
 #define IDC_AttractorStrengthLabel      3014
 #define IDC_NumPointsLabel              3015
 #define IDC_OverallStrengthLabel        3016
@@ -33,7 +36,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        3002
+#define _APS_NEXT_RESOURCE_VALUE        3003
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         3019
 #define _APS_NEXT_SYMED_VALUE           3000

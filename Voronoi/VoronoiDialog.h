@@ -62,4 +62,9 @@ private:
 
 	void DisableAll();
 	void SetState(int state);
+public:
+	afx_msg void OnBnClickedUndoCurves();
+	afx_msg void OnBnClickedClearPoints();
+	afx_msg void OnBnClickedBurn();
+	afx_msg void OnBnClickedHelp();
 };

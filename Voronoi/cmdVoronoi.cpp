@@ -47,7 +47,7 @@ public:
 	}
 
 	RndPointSet mySet;
-
+	CVoronoiDialog *m_dialog;
   // Returns the English command name.
 	const wchar_t* EnglishCommandName() { return L"Voronoi"; }
 
@@ -71,7 +71,7 @@ CRhinoCommand::result CCommandVoronoi::RunCommand( const CRhinoCommandContext& c
 
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
-	CVoronoiDialog *m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	m_dialog = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
 	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
 	{
 		m_dialog->ShowWindow( SW_SHOW );
@@ -452,6 +452,168 @@ CRhinoCommand::result CCommandTogglePtHide::RunCommand( const CRhinoCommandConte
 
 //
 // END TogglePtHide command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN UndoCurves command
+//
+
+class CCommandUndoCurves : public CRhinoCommand
+{
+public:
+	CCommandUndoCurves() {}
+	~CCommandUndoCurves() {}
+	UUID CommandUUID()
+	{
+		// {B9E715ED-94AE-4343-AFC9-71CDD523B888}
+		static const GUID UndoCurvesCommand_UUID =
+		{ 0xB9E715ED, 0x94AE, 0x4343, { 0xAF, 0xC9, 0x71, 0xCD, 0xD5, 0x23, 0xB8, 0x88 } };
+		return UndoCurvesCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"UndoCurves"; }
+	const wchar_t* LocalCommandName() { return L"UndoCurves"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandUndoCurves object
+static class CCommandUndoCurves theUndoCurvesCommand;
+
+CRhinoCommand::result CCommandUndoCurves::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.UndoCurves(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END UndoCurves command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN UndoPoints command
+//
+
+class CCommandUndoPoints : public CRhinoCommand
+{
+public:
+	CCommandUndoPoints() {}
+	~CCommandUndoPoints() {}
+	UUID CommandUUID()
+	{
+		// {D7EBE0AC-59A2-4DFA-BFB5-0B9C207CFD8E}
+		static const GUID UndoPointsCommand_UUID =
+		{ 0xD7EBE0AC, 0x59A2, 0x4DFA, { 0xBF, 0xB5, 0x0B, 0x9C, 0x20, 0x7C, 0xFD, 0x8E } };
+		return UndoPointsCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"UndoPoints"; }
+	const wchar_t* LocalCommandName() { return L"UndoPoints"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandUndoPoints object
+static class CCommandUndoPoints theUndoPointsCommand;
+
+CRhinoCommand::result CCommandUndoPoints::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.UndoPoints(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END UndoPoints command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN BurnData command
+//
+
+class CCommandBurnData : public CRhinoCommand
+{
+public:
+	CCommandBurnData() {}
+	~CCommandBurnData() {}
+	UUID CommandUUID()
+	{
+		// {41DFD99A-40F0-45B7-A66D-4A713289F598}
+		static const GUID BurnDataCommand_UUID =
+		{ 0x41DFD99A, 0x40F0, 0x45B7, { 0xA6, 0x6D, 0x4A, 0x71, 0x32, 0x89, 0xF5, 0x98 } };
+		return BurnDataCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"BurnData"; }
+	const wchar_t* LocalCommandName() { return L"BurnData"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandBurnData object
+static class CCommandBurnData theBurnDataCommand;
+
+CRhinoCommand::result CCommandBurnData::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.BurnData(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END BurnData command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN HelpDlg command
+//
+
+class CCommandHelpDlg : public CRhinoCommand
+{
+public:
+	CCommandHelpDlg() {}
+	~CCommandHelpDlg() {}
+	UUID CommandUUID()
+	{
+		// {2C70EA9D-A6CC-4635-81B3-53E2D071B10C}
+		static const GUID HelpDlgCommand_UUID =
+		{ 0x2C70EA9D, 0xA6CC, 0x4635, { 0x81, 0xB3, 0x53, 0xE2, 0xD0, 0x71, 0xB1, 0x0C } };
+		return HelpDlgCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"HelpDlg"; }
+	const wchar_t* LocalCommandName() { return L"HelpDlg"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandHelpDlg object
+static class CCommandHelpDlg theHelpDlgCommand;
+
+CRhinoCommand::result CCommandHelpDlg::RunCommand( const CRhinoCommandContext& context )
+{
+	/*CVoronoiDialog *help = new CVoronoiDialog( theVoronoiCommand.m_dialog );
+	if( help->Create(IDD_HELP_DLG, theVoronoiCommand.m_dialog) )
+	{
+		//help->ShowWindow( SW_SHOW );
+		//help->UpdateWindow();
+		//help->SetFocus();
+	}*/
+
+		CVoronoiDialog *help = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	if( help->Create(IDD_DIALOG2, CWnd::FromHandle(RhinoApp().MainWnd())) )
+	{
+		help->ShowWindow( SW_SHOW );
+		help->UpdateWindow();
+		help->SetFocus();
+	}
+	return CRhinoCommand::success;
+}
+
+//
+// END HelpDlg command
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////

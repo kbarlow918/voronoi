@@ -593,6 +593,21 @@ void RndPointSet::ToggleHidePoints(const CRhinoCommandContext& context, bool dra
 	context.m_doc.Redraw();
 }
 
+void RndPointSet::BurnData(const CRhinoCommandContext& context)
+{
+	rndPoints.clear();
+	cellBorderList.clear();
+	pointAttractors.clear();
+	curveAttractors.clear();
+	points.clear();
+	cellLines.clear();
+	surfaceCurves.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nData burned");
+}
+
 void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 {
 	unsigned int i;
@@ -624,10 +639,62 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	curveAttractors.clear();
 	points.clear();
 	cellLines.clear();
+	surfaceCurves.clear();
 
 	context.m_doc.Redraw();
 
 	RhinoApp().Print("\nData cleared");
+}
+
+void RndPointSet::UndoCurves(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.ShowObject(points.at(i));
+	}
+	for(i = 0; i < cellLines.size(); i++)
+	{
+	  context.m_doc.DeleteObject(cellLines.at(i));
+	}
+	for(i = 0; i < surfaceCurves.size(); i++)
+	{
+	  context.m_doc.DeleteObject(surfaceCurves.at(i));
+	}
+
+	cellBorderList.clear();
+	cellLines.clear();
+	surfaceCurves.clear();
+	rndPoints.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nCurves cleared");
+}
+
+void RndPointSet::UndoPoints(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < pointAttractors.size(); i++)
+	{
+	  pointAttractors.at(i).pointObj = context.m_doc.AddPointObject(pointAttractors.at(i).point);
+	}
+	for(i = 0; i < curveAttractors.size(); i++)
+	{
+	  curveAttractors.at(i).objRef = context.m_doc.AddCurveObject(*(curveAttractors.at(i).curveObj));
+	}
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.DeleteObject(points.at(i));
+	}
+
+	points.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nPoints cleared");
 }
 
 void RndPointSet::Test( const CRhinoCommandContext& context, double a, double b, double c, double d )
