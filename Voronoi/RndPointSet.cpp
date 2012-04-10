@@ -80,7 +80,7 @@ void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double
   }
   else
   {
-	CurveAttractor ca(ref, value, surf, go.Object(0));
+	CurveAttractor ca(value, surf, go.Object(0));
 	curveAttractors.push_back(ca);
 	context.m_doc.Redraw();
   }
@@ -121,9 +121,9 @@ void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
 	  for(j = 0; j < curveAttractors.size(); j++)
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
-		  if(curveAttractors.at(j).curveObj == curveAttractor)
+		  if(curveAttractors.at(j).GetCurve() == curveAttractor)
 		  {
-			  context.m_doc.DeleteObject(curveAttractors.at(j).objRef);
+			  context.m_doc.DeleteObject(curveAttractors.at(j).GetObjRef());
 			  curveAttractors.erase(curveAttractors.begin() + j);
 			  context.m_doc.Redraw();
 			  RhinoApp().Print("Attractor deleted\n");
@@ -156,7 +156,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
 		  if(pointAttractors.at(j).point == ptAttractor->point)
 		  {
-			  RhinoApp().Print("Point #%d: x %.2f y %.2f z %.2f Current strength: %f\n", j, pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z, pointAttractors.at(j).strength);
+			  RhinoApp().Print("Point #%d: x=%.2f y=%.2f z=%.2f Current strength: %f\n", j, pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z, pointAttractors.at(j).strength);
 
 			  CRhinoGetString getNumber;
 			  double newStrength = NULL;
@@ -187,7 +187,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 	  for(j = 0; j < curveAttractors.size(); j++)
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
-		  if(curveAttractors.at(j).curveObj == curveAttractor)
+		  if(curveAttractors.at(j).GetCurve() == curveAttractor)
 		  {
 			  RhinoApp().Print("Curve #%d: Current strength: %f\n", j, curveAttractors.at(j).strength);
 
@@ -543,7 +543,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	  }
 	  for(i = 0; i < curveAttractors.size(); i++)
 	  {
-		  context.m_doc.DeleteObject(curveAttractors.at(i).objRef);
+		  context.m_doc.DeleteObject(curveAttractors.at(i).GetObjRef());
 	  }
 
 	  context.m_doc.Redraw();
@@ -618,7 +618,7 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	}
 	for(i = 0; i < curveAttractors.size(); i++)
 	{
-	  context.m_doc.DeleteObject(curveAttractors.at(i).objRef);
+	  context.m_doc.DeleteObject(curveAttractors.at(i).GetObjRef());
 	}
 	for(i = 0; i < points.size(); i++)
 	{
@@ -683,7 +683,7 @@ void RndPointSet::UndoPoints(const CRhinoCommandContext& context)
 	}
 	for(i = 0; i < curveAttractors.size(); i++)
 	{
-	  curveAttractors.at(i).objRef = context.m_doc.AddCurveObject(*(curveAttractors.at(i).curveObj));
+	  curveAttractors.at(i).SetObjRef(context.m_doc.AddCurveObject(*(curveAttractors.at(i).GetCurve())));
 	}
 	for(i = 0; i < points.size(); i++)
 	{
