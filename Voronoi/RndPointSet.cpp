@@ -220,6 +220,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
 {
+	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
 	  ON_SimpleArray<const ON_Curve*> curveArr;
@@ -231,9 +232,21 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  double umin, umax, vmin, vmax;
 	  obj->GetDomain(0, &umin, &umax);
 	  obj->GetDomain(1, &vmin, &vmax);
-	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,0); //the user needs to be able to decide these values
+	  //RhinoApp().Print(L"\n start gen \n");
+	  //RhinoApp().Print(L"\n vsize: %d umin: %f umax: %f vmin: %f vmax: %f\n",vsize, umin, umax, vmin, vmax);
+	  if(xValues == NULL || yValues == NULL )
+	  {
+		RhinoApp().Print(L"\n NULL ARRAY \n");
+	  }
+	  /*for(int k=0; k<vsize; k++)
+      {
+		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
+	  }*/
+
+	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,0); 
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
+	  RhinoApp().Print(L"\n start ittr \n");
 	  for(int i=0; i<vsize; i++)
 	  {
 		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
@@ -274,7 +287,6 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		pointArr.Append(first);
 		pointArr.Append(second);		
 		cellBorderList.push_back(cb);
-
 		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
 		if(item != NULL)//draw the cells
 		{
@@ -284,7 +296,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				context.m_doc.HideObject(temp);
 		}else
 		{
-			RhinoApp().Print(L"no projection");
+			//RhinoApp().Print(L"no projection");
 		}
 
 		//search for closest points
@@ -346,7 +358,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				curveArr.Append(item);
 			}else
 			{
-				RhinoApp().Print(L"no projection");
+				//RhinoApp().Print(L"no projection");
 			}
 	  }
 	  //context.m_doc.Redraw();
@@ -613,13 +625,15 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 		  //RhinoApp().Print(L"p0.u = %f ",u);
 		  //RhinoApp().Print(L"p0.v = %f ",v);
 
-		  RhinoApp().Print(L" \n adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
+		  RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 
 		  //deal with attractors
+		  
 		  if(pointAttractors.size() + curveAttractors.size() > 0)
 		  {
+			  
 			  double uChange = 0;
 			  double vChange = 0;
 
@@ -643,11 +657,15 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 			  else if(u > u2) u = u2;
 			  if(v < v1) v = v1;
 			  else if(v > v2) v = v2;
-
-			  xValues[i] = (float)(u);
+	
+			  /*xValues[i] = (float)(u);		COMMENTED THIS OUT BECAUSE I THINK IT NEEDS TO BE OUTSIDE THE IF
 			  yValues[i] = (float)(v);
-			  p0 = surface->PointAt(u, v);
+			  p0 = surface->PointAt(u, v);*/ 
 		  }
+		  xValues[i] = (float)(u);
+		  yValues[i] = (float)(v);
+		  p0 = surface->PointAt(u, v);
+
 		  points.push_back(context.m_doc.AddPointObject(p0));
 	  }
 	  return true;

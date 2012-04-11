@@ -127,7 +127,7 @@ public:
 	{
 		if(iteratorEdges == 0)
 		{
-			RhinoApp().Print(L"No Edges\n");
+			//RhinoApp().Print(L"No Edges\n");
 			return false;
 		}
 
@@ -143,6 +143,7 @@ public:
 
 
 private:
+	//int VoronoiDiagramGenerator::EdgeCompare(const void * a, const void * b);
 	void cleanup();
 	void cleanupEdges();
 	char *getfree(struct Freelist *fl);	
@@ -208,7 +209,7 @@ private:
 	struct  Freelist	hfl;
 	struct	Halfedge *ELleftend, *ELrightend;
 	int 	ELhashsize;
-
+	int		numedges;
 	int		triangulate, sorted, plot, debug;
 	float	xmin, xmax, ymin, ymax, deltax, deltay;
 
