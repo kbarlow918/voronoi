@@ -40,7 +40,7 @@ private:
 	std::vector<CellBorder> cellBorderList;
 	bool pointsHidden;
 	const ON_Surface* surface;
-	
+	const ON_Brep* mainBrep;
 };
 
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2);
