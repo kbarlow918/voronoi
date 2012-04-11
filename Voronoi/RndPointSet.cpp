@@ -221,6 +221,8 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
 {
 	  const ON_Surface* obj = surface;
+	  ON_Brep* brep = obj->BrepForm();
+	  ON_SimpleArray<const ON_Curve*> curveArr;
 	  float x1,y1,x2,y2;
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
@@ -229,7 +231,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  double umin, umax, vmin, vmax;
 	  obj->GetDomain(0, &umin, &umax);
 	  obj->GetDomain(1, &vmin, &vmax);
-	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,.0001); //the user needs to be able to decide these values
+	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,0); //the user needs to be able to decide these values
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  for(int i=0; i<vsize; i++)
@@ -325,9 +327,23 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			rndPoints.at(i).QuickSort(&sortPoints);
 			//rndPoints.at(i).QuickSort(ON_CompareIncreasing);
 			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .01, 0);
+			//trimming code
+			/*
+			ON_BrepLoop& loop = brep->NewLoop( ON_BrepLoop::inner );
+			
+			int c2i, ei=0, bRev3d=0;
+			ON_Surface::ISO iso = ON_Surface::not_iso;
+			c2i = brep->m_C2.Count();
+			brep->m_C2.Append(item);
+			ON_BrepTrim& trim = brep->NewTrim( brep->m_E[ei], bRev3d, loop, c2i );
+			*/
+				
+			
 			if(item != NULL)
 			{
 				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+				
+				curveArr.Append(item);
 			}else
 			{
 				RhinoApp().Print(L"no projection");
@@ -341,6 +357,16 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			cb.findConnected(cellBorderList);
 	  }
 	  RhinoApp().Print(L"Found connected subsets");*/
+	  ON_Brep* split = RhinoSplitBrepFace(*mainBrep, 0 , curveArr, .01, true);
+	  if (split==NULL)
+	  {
+		  RhinoApp().Print(L"split failed");
+	  }else
+	  {
+		  RhinoApp().Print(L"split worked");
+		  context.m_doc.AddBrepObject(*split);
+	  }
+
 	  delete(xValues);
 	  delete(yValues);
 	  context.m_doc.Redraw();
@@ -387,6 +413,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	RhinoApp().Print(L"object initialization error");
 	return ;
   }	
+  mainBrep = ref.Brep();
   surface = obj;
   
   //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
