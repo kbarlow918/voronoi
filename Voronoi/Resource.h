@@ -31,6 +31,7 @@
 #define IDC_OverallStrengthLabel        3016
 #define IDC_MinDistLabel                3017
 #define IDC_CurveOffsetLabel            3018
+#define IDC_SLIDER1                     3019
 
 // Next default values for new objects
 // 
@@ -38,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        3003
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         3019
+#define _APS_NEXT_CONTROL_VALUE         3020
 #define _APS_NEXT_SYMED_VALUE           3000
 #endif
 #endif
