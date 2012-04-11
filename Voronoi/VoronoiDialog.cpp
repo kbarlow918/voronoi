@@ -49,7 +49,7 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	SetState(POINT_GENERATION);
 
 	//default values
-	attractor_StrengthEdit.SetWindowTextW(L"2");
+	attractor_StrengthEdit.SetWindowTextW(L"70");
 	points_OverallStrengthEdit.SetWindowTextW(L"2.0");
 	points_NumPointEdit.SetWindowTextW(L"50");
 	voronoi_InnerCurveOffsetEdit.SetWindowTextW(L"0.5");

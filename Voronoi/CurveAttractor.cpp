@@ -37,16 +37,16 @@ void CurveAttractor::GetClosestPointAttractor(ON_3dPoint aPoint, PointAttractor 
 	//get the 3d point on the surface
 	//surfacePointTemp = surface->PointAt(u, v);
 	surfacePointTemp = aPoint;
-	RhinoApp().Print(" surface point: %f %f %f ", surfacePointTemp.x, surfacePointTemp.y, surfacePointTemp.z);
+	//RhinoApp().Print(" surface point: %f %f %f ", surfacePointTemp.x, surfacePointTemp.y, surfacePointTemp.z);
 
 	//find parameter of closest point to that point on the curve
 	if(objRef.Curve()->GetClosestPoint(surfacePointTemp, &closestPointParam))
 	{
-		RhinoApp().Print(" point on curve param: %f ", closestPointParam);
+		//RhinoApp().Print(" point on curve param: %f ", closestPointParam);
 
 		//get the actual point
 		closestPoint = objRef.Curve()->PointAt(closestPointParam);		
-		RhinoApp().Print(" point on curve: %f %f %f \n", closestPoint.x, closestPoint.y, closestPoint.z);
+		//RhinoApp().Print(" point on curve: %f %f %f \n", closestPoint.x, closestPoint.y, closestPoint.z);
 
 		//use that to get parameters of closest point on the surface (just in case)
 		if(surface->GetClosestPoint(closestPoint, &attractorU, &attractorV))

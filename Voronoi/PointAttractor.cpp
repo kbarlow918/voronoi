@@ -33,7 +33,7 @@ void PointAttractor::SetMaxDist()
 		//Get the UV representation of the chosen attractor
 		if(surface->GetClosestPoint(point, &myU, &myV))
 		{
-			RhinoApp().Print("\nGot PA UV: %f %f", myU, myV);
+			//RhinoApp().Print("\nGot PA UV: %f %f", myU, myV);
 
 			//Divide the UV plane into quadrants
 			double uMid, vMid;
@@ -141,5 +141,5 @@ void PointAttractor::Shift(double u, double v, double* uSum, double* vSum)
 	*uSum += (scaleFactor*uDiff);
 	*vSum += (scaleFactor*vDiff);
 
-	RhinoApp().Print("pt: %f  %f   me: %f  %f   diff: %f  %f   scale:  %f   sums: %f   %f", u, v, myU, myV, uDiff, vDiff, scaleFactor, *uSum, *vSum);
+	//RhinoApp().Print("pt: %f  %f   me: %f  %f   diff: %f  %f   scale:  %f   sums: %f   %f", u, v, myU, myV, uDiff, vDiff, scaleFactor, *uSum, *vSum);
 }
