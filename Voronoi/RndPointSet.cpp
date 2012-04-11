@@ -419,7 +419,8 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   }
   //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
   
-  if(EvaluateAttractorsChanceToStay(context, numPoints, maxExponent))
+  //if(EvaluateAttractorsChanceToStay(context, numPoints, maxExponent))
+  if(EvaluateAttractorsManyVectors(context, numPoints, maxExponent))
   {
 	  unsigned int i;
 	  for(i = 0; i < pointAttractors.size(); i++)
@@ -549,6 +550,76 @@ bool RndPointSet::EvaluateAttractorsChanceToStay(const CRhinoCommandContext& con
 			  {
 				  redo = false;
 			  }
+		  }
+		  points.push_back(context.m_doc.AddPointObject(p0));
+	  }
+	  return true;
+  }
+  else
+  {
+	return false;
+  }
+}
+
+bool RndPointSet::EvaluateAttractorsSingleVector(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
+{
+
+}
+
+bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
+{
+  double u1, u2, v1, v2;
+  if(surface->GetDomain(0, &u1, &u2) && surface->GetDomain(1, &v1, &v2))
+  {
+	  xValues = new float[numPoints];
+	  yValues = new float[numPoints];
+	  unsigned int i;
+	  ON_3dPoint prev;
+	  for(i = 0; i < numPoints; i++)
+	  {
+		  ON_3dPoint p0;
+		  double u, v = 0.0;
+		  p0 = surface->PointAt( u = fRand(u1, u2), v = fRand(v1, v2));
+		  //RhinoApp().Print(L"p0.x = %f ",p0.x);
+		  //RhinoApp().Print(L"p0.y = %f ",p0.y);
+		  //RhinoApp().Print(L"p0.z = %f ",p0.z);
+		  //RhinoApp().Print(L"p0.u = %f ",u);
+		  //RhinoApp().Print(L"p0.v = %f ",v);
+
+		  RhinoApp().Print(L" \n adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
+		  //RhinoApp().Print(L"p0.u = %f\n",u);
+		  //RhinoApp().Print(L"p0.v = %f\n",v);
+
+		  //deal with attractors
+		  if(pointAttractors.size() + curveAttractors.size() > 0)
+		  {
+			  double uChange = 0;
+			  double vChange = 0;
+
+			  unsigned int j;
+			  for(j = 0; j < pointAttractors.size(); j++)
+			  {
+				  pointAttractors.at(j).Shift(u, v, &uChange, &vChange);
+			  }
+			  for(j = 0; j < curveAttractors.size(); j++)
+			  {
+				  PointAttractor pa;
+				  curveAttractors.at(j).GetClosestPointAttractor(p0, &pa);
+				  if(&pa != NULL)
+					  pa.Shift(u, v, &uChange, &vChange);
+			  }
+			  u += uChange;
+			  v += vChange;
+
+			  //make sure the values aren't out of bounds
+			  if(u < u1) u = u1;
+			  else if(u > u2) u = u2;
+			  if(v < v1) v = v1;
+			  else if(v > v2) v = v2;
+
+			  xValues[i] = (float)(u);
+			  yValues[i] = (float)(v);
+			  p0 = surface->PointAt(u, v);
 		  }
 		  points.push_back(context.m_doc.AddPointObject(p0));
 	  }

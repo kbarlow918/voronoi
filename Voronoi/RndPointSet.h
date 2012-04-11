@@ -15,6 +15,8 @@ public:
 	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	bool EvaluateAttractorsChanceToStay(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
+	bool EvaluateAttractorsSingleVector(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
+	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
 	void ViewEdit( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
 	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
@@ -22,7 +24,7 @@ public:
 	void UndoCurves(const CRhinoCommandContext& context);
 	void UndoPoints(const CRhinoCommandContext& context);
 	void ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines);
-	double fRand(double fMin, double fMax);
+	static double fRand(double fMin, double fMax);
 	
 	bool ProjectCurveToBrep(
         const ON_Brep& brep, 
