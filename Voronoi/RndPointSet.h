@@ -14,25 +14,14 @@ public:
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
-	bool EvaluateAttractorsChanceToStay(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
-	bool EvaluateAttractorsSingleVector(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
 	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
 	void ViewEdit( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
-	void Test( const CRhinoCommandContext& context, double a, double b, double c, double d );
 	void ClearAll(const CRhinoCommandContext& context);
 	void UndoCurves(const CRhinoCommandContext& context);
 	void UndoPoints(const CRhinoCommandContext& context);
 	void ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines);
 	static double fRand(double fMin, double fMax);
-	
-	bool ProjectCurveToBrep(
-        const ON_Brep& brep, 
-        const ON_Curve& curve, 
-        const ON_3dVector& dir, 
-        double tolerance,
-        ON_SimpleArray<ON_Curve*>& output_curves
-        );
 	
 private:
 	std::vector<PointAttractor> pointAttractors;

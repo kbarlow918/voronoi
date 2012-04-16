@@ -458,7 +458,6 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   }
   //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
   
-  //if(EvaluateAttractorsChanceToStay(context, numPoints, maxExponent))
   if(EvaluateAttractorsManyVectors(context, numPoints, maxExponent))
   {
 	  unsigned int i;
@@ -477,132 +476,6 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   {
 	RhinoApp().Print(L"object domain error");
   }
-}
-
-bool RndPointSet::EvaluateAttractorsChanceToStay(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
-{
-
-  double u1, u2, v1, v2, minStrength;
-  minStrength = NULL;
-
-  if(pointAttractors.size() > 0)
-  {
-	  //find the attractor with the least strength (magnitude)
-	  unsigned int j;
-	  minStrength = abs(pointAttractors.at(0).strength);
-	  for(j = 1; j < pointAttractors.size(); j++)
-	  {
-		  if(abs(pointAttractors.at(j).strength) < minStrength)
-			  minStrength = abs(pointAttractors.at(j).strength);
-	  }
-  }
-  RhinoApp().Print("\nStarting curve min");
-  if(curveAttractors.size() > 0)
-  {
-	  //find the attractor with the least strength (magnitude)
-	  unsigned int j;
-	  if(minStrength == NULL)
-	  {
-		RhinoApp().Print("\nNo point attractors - min str was null");
-		minStrength = abs(curveAttractors.at(0).strength);
-	  }
-	  for(j = 0; j < curveAttractors.size(); j++)
-	  {
-		  RhinoApp().Print("\nFinding curve min");
-		  if(abs(curveAttractors.at(j).strength) < minStrength)
-			  minStrength = abs(curveAttractors.at(j).strength);
-	  }
-  }
-
-  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
-
-  if(surface->GetDomain(0, &u1, &u2) && surface->GetDomain(1, &v1, &v2))
-  {
-	  xValues = new float[numPoints];
-	  yValues = new float[numPoints];
-	  unsigned int i;
-	  ON_3dPoint prev;
-	  for(i = 0; i < numPoints; i++)
-	  {
-		  bool redo = true; //used to redo due to attractors
-		  ON_3dPoint p0;
-		  while(redo)
-		  {
-			  double u, v = 0.0;
-			  p0 = surface->PointAt( u = fRand(u1, u2), v = fRand(v1, v2));
-			  //context.m_doc.AddPointObject(p0); 
-			  //RhinoApp().Print(L"p0.x = %f ",p0.x);
-			  //RhinoApp().Print(L"p0.y = %f ",p0.y);
-			  //RhinoApp().Print(L"p0.z = %f ",p0.z);
-			  //RhinoApp().Print(L"p0.u = %f ",u);
-			  //RhinoApp().Print(L"p0.v = %f ",v);
-
-			  xValues[i] = (float)(u);
-			  yValues[i] = (float)(v);
-			  RhinoApp().Print(L" \n adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
-			  //RhinoApp().Print(L"p0.u = %f\n",u);
-			  //RhinoApp().Print(L"p0.v = %f\n",v);
-
-			  //deal with attractors
-			  if(pointAttractors.size() + curveAttractors.size() > 0)
-			  {
-				  double totalScore = 0.0;
-				  double totalMultOfMinStrength = 0.0;
-				  unsigned int j;
-				  for(j = 0; j < pointAttractors.size(); j++)
-				  {
-					  double score = pointAttractors.at(j).GetScore(u,v);
-					  //How many times stronger than the weakest is this attractor?
-					  double minStrengthMult = abs(pointAttractors.at(j).strength)/minStrength;
-					  RhinoApp().Print("\nPoint %f %f Point Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
-					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
-					  totalMultOfMinStrength += minStrengthMult;
-				  }
-				  for(j = 0; j < curveAttractors.size(); j++)
-				  {
-					  double score = curveAttractors.at(j).GetScore(u,v, p0);
-					  //How many times stronger than the weakest is this attractor?
-					  double minStrengthMult = abs(curveAttractors.at(j).strength)/minStrength;
-					  RhinoApp().Print("\nPoint %f %f Curve Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
-					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
-					  totalMultOfMinStrength += minStrengthMult;
-				  }
-
-				  //double smallExponent = (totalScore/totalMultOfMinStrength)*maxExponent;
-				  //double stayChance = (exp(smallExponent)/exp(maxExponent));
-				  double stayChance = (totalScore/totalMultOfMinStrength);
-				  //double rolled = fRand(0, 1);
-
-				  double rolled = 1/exp((1-fRand(0, 1))*maxExponent);
-				  RhinoApp().Print("\nChance to stay: %f Rolled: %f", stayChance, rolled);
-				  if(rolled > stayChance)
-				  {
-					  RhinoApp().Print("\nRepicking point");
-				  }
-				  else
-				  {
-					  RhinoApp().Print("\nPoint accepted");
-					  redo = false;
-				  }
-			  }
-			  else
-			  {
-				  redo = false;
-			  }
-		  }
-		  points.push_back(context.m_doc.AddPointObject(p0));
-	  }
-	  return true;
-  }
-  else
-  {
-	return false;
-  }
-}
-
-bool RndPointSet::EvaluateAttractorsSingleVector(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
-{
-
 }
 
 bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
@@ -816,73 +689,9 @@ void RndPointSet::UndoPoints(const CRhinoCommandContext& context)
 	RhinoApp().Print("\nPoints cleared");
 }
 
-void RndPointSet::Test( const CRhinoCommandContext& context, double a, double b, double c, double d )
-{
-  // Pick a surface to evaluate
-  CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select surface to evaluate - test function" );
-  go.SetGeometryFilter( CRhinoGetObject::surface_object);
-  go.GetObjects( 1, 1 );
-
- 
-  // Get the surface geometry
-  const CRhinoObjRef& ref = go.Object(0);
-  const ON_Surface* obj = ref.Surface();
-
-  ON_3dPoint p0 = obj->PointAt( a, b);
-  double u, v;
-  obj->GetClosestPoint(p0, &u, &v);
-  ON_3dPoint p1 = obj->PointAt( u, v);
-
-  context.m_doc.AddPointObject(p1);
-  context.m_doc.Redraw();
-}
 
 double RndPointSet::fRand(double fMin, double fMax)
 {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
-}
-
-/*
-Description:
-  Projects a curve onto a surface or polysurface
-Parameters:
-  brep  - [in] The brep to project the curve onto.
-  curve - [in] The curve to project.
-  dir   - [in] The direction of the projection.
-  tol   - [in] The intersection tolerance.
-  output_curves - [out] The output curves. 
-                        NOTE, the caller is responsible 
-                        for destroying these curves.
-Returns:
-  true if successful.
-  false if unsuccessful.
-*/
-bool RndPointSet::ProjectCurveToBrep(
-        const ON_Brep& brep, 
-        const ON_Curve& curve, 
-        const ON_3dVector& dir, 
-        double tolerance,
-        ON_SimpleArray<ON_Curve*>& output_curves
-        )
-{
-  ON_3dVector n = dir;
-  if( !n.Unitize() ) 
-    return false;
- 
-  ON_BoundingBox bbox = brep.BoundingBox();
-  bbox.Union( curve.BoundingBox() );
- 
-  ON_Surface* pExtrusion = RhinoExtrudeCurveStraight( &curve, dir, bbox.Diagonal().Length() );
-  if( 0 == pExtrusion )
-    return false;
- 
-  ON_Brep* pBrep = ON_Brep::New();
-  pBrep->Create( pExtrusion );
- 
-  BOOL rc = RhinoIntersectBreps( *pBrep, brep, tolerance, output_curves );
-  delete pBrep; // Don't leak...
- 
-  return ( rc ) ? true : false;
 }
