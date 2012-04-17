@@ -25,7 +25,6 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, points_NumPointEdit);
 	DDX_Control(pDX, IDC_STRENGTH, attractor_StrengthEdit);
-	DDX_Control(pDX, IDC_OVERALLSTRENGTH, points_OverallStrengthEdit);
 	DDX_Control(pDX, IDC_CELL_LINES, voronoi_DrawCellLines);
 	DDX_Control(pDX, IDC_BUTTON1, attractor_AddPtAttractorButton);
 	DDX_Control(pDX, IDC_ADDCURVE, attractor_AddCrvAttractorButton);
@@ -45,15 +44,19 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CurveOffsetLabel, voronoi_CurveOffsetLabel);
 	DDX_Control(pDX, IDC_TRIM, trim_TrimButton);
 	DDX_Control(pDX, IDC_UNDO_TRIM, trim_UndoTrimButton);
+	DDX_Control(pDX, IDC_STRENGTH_SLIDER, points_strength_slider);
 
 	SetState(POINT_GENERATION);
 
 	//default values
 	attractor_StrengthEdit.SetWindowTextW(L"70");
-	points_OverallStrengthEdit.SetWindowTextW(L"2.0");
 	points_NumPointEdit.SetWindowTextW(L"50");
 	voronoi_InnerCurveOffsetEdit.SetWindowTextW(L"0.5");
 	voronoi_MinDistEdit.SetWindowTextW(L"0.01");
+	
+	points_strength_slider.SetRangeMin(0);
+	points_strength_slider.SetRangeMax(100, true);
+	points_strength_slider.SetPos(50);
 }
 
 
@@ -84,7 +87,7 @@ void CVoronoiDialog::DisableAll()
 	attractor_StrengthEdit.EnableWindow(val);
 	attractor_StrengthLabel.EnableWindow(val);
 
-	points_OverallStrengthEdit.EnableWindow(val);
+	points_strength_slider.EnableWindow(val);
 	points_NumPointEdit.EnableWindow(val);
 	points_GenerateButton.EnableWindow(val);
 	points_ClearPointsButton.EnableWindow(val);
@@ -135,7 +138,7 @@ void CVoronoiDialog::SetState(int state)
 		attractor_DeleteAttractorButton.EnableWindow(true);
 		attractor_StrengthEdit.EnableWindow(true);
 		attractor_StrengthLabel.EnableWindow(true);
-		points_OverallStrengthEdit.EnableWindow(true);
+		points_strength_slider.EnableWindow(true);
 		points_NumPointEdit.EnableWindow(true);
 		points_GenerateButton.EnableWindow(true);
 		points_NumPtsLabel.EnableWindow(true);
@@ -153,7 +156,8 @@ void CVoronoiDialog::OnBnClickedOk()
 	points_NumPointEdit.GetWindowText(num);
 	cmd += (LPCTSTR)num;
 	cmd += (LPCTSTR)" ";
-	points_OverallStrengthEdit.GetWindowText(num);
+	int pos = points_strength_slider.GetPos();
+	num.Format(_T("%d"), pos);
 	cmd += (LPCTSTR)num;
 
 	RhinoApp().RunScript( cmd , 0 );

@@ -2,6 +2,7 @@
 
 #include "Resource.h"
 #include "afxwin.h"
+#include "afxcmn.h"
 // CVoronoiDialog dialog
 
 #define POINT_GENERATION	0
@@ -41,7 +42,7 @@ private:
 	CEdit attractor_StrengthEdit;
 	CStatic attractor_StrengthLabel;
 
-	CEdit points_OverallStrengthEdit;
+	CSliderCtrl points_strength_slider;
 	CEdit points_NumPointEdit;
 	CButton points_GenerateButton;
 	CButton points_ClearPointsButton;
@@ -67,4 +68,5 @@ public:
 	afx_msg void OnBnClickedClearPoints();
 	afx_msg void OnBnClickedBurn();
 	afx_msg void OnBnClickedHelp();
+	
 };

@@ -7,7 +7,7 @@ public:
 	~PointAttractor(void);
 	PointAttractor(ON_3dPoint aPoint, double aStrength, CRhinoPointObject* aPointObj, const ON_Surface* aSurface);
 	double GetScore(double u, double v);
-	void Shift(double u, double v, double* uSum, double* vSum);
+	void Shift(double u, double v, double* uSum, double* vSum, double overallStrength);
 
 	CRhinoPointObject* pointObj;
 	double strength;

@@ -88,7 +88,7 @@ double PointAttractor::GetScore(double u, double v)
 	//Weight the score based on the specificed strength
 	return abs(score/strength);
 }
-void PointAttractor::Shift(double u, double v, double* uSum, double* vSum)
+void PointAttractor::Shift(double u, double v, double* uSum, double* vSum, double overallStrength)
 {
 	double uDiff = myU-u;
 	double vDiff = myV-v;
@@ -135,7 +135,7 @@ void PointAttractor::Shift(double u, double v, double* uSum, double* vSum)
 		}
 	}
 
-	double scaleFactor = RndPointSet::fRand(0, abs(strength))/MAX_STRENGTH;
+	double scaleFactor = RndPointSet::fRand(abs(strength)*(overallStrength/100), abs(strength))/MAX_STRENGTH;
 	//double scaleFactor = strength/MAX_STRENGTH;
 
 	*uSum += (scaleFactor*uDiff);

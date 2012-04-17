@@ -602,8 +602,8 @@ CRhinoCommand::result CCommandHelpDlg::RunCommand( const CRhinoCommandContext& c
 		//help->SetFocus();
 	}*/
 
-		CVoronoiDialog *help = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
-	if( help->Create(IDD_DIALOG2, CWnd::FromHandle(RhinoApp().MainWnd())) )
+	CVoronoiDialog *help = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	if( help->Create(IDD_HELP_DLG, CWnd::FromHandle(RhinoApp().MainWnd())) )
 	{
 		help->ShowWindow( SW_SHOW );
 		help->UpdateWindow();

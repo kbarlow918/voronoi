@@ -403,7 +403,7 @@ int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
     int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
     return d1 > d2;
 }
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength )
 {
   // Pick a surface to evaluate
   CRhinoGetObject go;
@@ -458,7 +458,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   }
   //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
   
-  if(EvaluateAttractorsManyVectors(context, numPoints, maxExponent))
+  if(EvaluateAttractorsManyVectors(context, numPoints, overallStrength))
   {
 	  unsigned int i;
 	  for(i = 0; i < pointAttractors.size(); i++)
@@ -478,7 +478,7 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   }
 }
 
-bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent)
+bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength)
 {
   double u1, u2, v1, v2;
   if(surface->GetDomain(0, &u1, &u2) && surface->GetDomain(1, &v1, &v2))
@@ -513,14 +513,14 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 			  unsigned int j;
 			  for(j = 0; j < pointAttractors.size(); j++)
 			  {
-				  pointAttractors.at(j).Shift(u, v, &uChange, &vChange);
+				  pointAttractors.at(j).Shift(u, v, &uChange, &vChange, overallStrength);
 			  }
 			  for(j = 0; j < curveAttractors.size(); j++)
 			  {
 				  PointAttractor pa;
 				  curveAttractors.at(j).GetClosestPointAttractor(p0, &pa);
 				  if(&pa != NULL)
-					  pa.Shift(u, v, &uChange, &vChange);
+					  pa.Shift(u, v, &uChange, &vChange, overallStrength);
 			  }
 			  u += uChange;
 			  v += vChange;

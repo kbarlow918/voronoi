@@ -14,9 +14,9 @@ public:
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
-	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent);
+	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength);
 	void ViewEdit( const CRhinoCommandContext& context );
-	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent );
+	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength );
 	void ClearAll(const CRhinoCommandContext& context);
 	void UndoCurves(const CRhinoCommandContext& context);
 	void UndoPoints(const CRhinoCommandContext& context);
