@@ -45,6 +45,7 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TRIM, trim_TrimButton);
 	DDX_Control(pDX, IDC_UNDO_TRIM, trim_UndoTrimButton);
 	DDX_Control(pDX, IDC_STRENGTH_SLIDER, points_strength_slider);
+	DDX_Control(pDX, IDC_INDVSTRENGTH_SLIDER, attractor_strength_slider);
 
 	SetState(POINT_GENERATION);
 
@@ -53,10 +54,13 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	points_NumPointEdit.SetWindowTextW(L"50");
 	voronoi_InnerCurveOffsetEdit.SetWindowTextW(L"0.5");
 	voronoi_MinDistEdit.SetWindowTextW(L"0.01");
-	
+
 	points_strength_slider.SetRangeMin(0);
 	points_strength_slider.SetRangeMax(100, true);
 	points_strength_slider.SetPos(50);
+	attractor_strength_slider.SetRange(-100, 100, true);
+	attractor_strength_slider.SetPos(70);
+	
 }
 
 
@@ -73,6 +77,7 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_CLEAR_POINTS, &CVoronoiDialog::OnBnClickedClearPoints)
 	ON_BN_CLICKED(IDC_BURN, &CVoronoiDialog::OnBnClickedBurn)
 	ON_BN_CLICKED(IDC_HELP, &CVoronoiDialog::OnBnClickedHelp)
+	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_INDVSTRENGTH_SLIDER, &CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider)
 END_MESSAGE_MAP()
 
 
@@ -86,6 +91,7 @@ void CVoronoiDialog::DisableAll()
 	attractor_DeleteAttractorButton.EnableWindow(val);
 	attractor_StrengthEdit.EnableWindow(val);
 	attractor_StrengthLabel.EnableWindow(val);
+	attractor_strength_slider.EnableWindow(val);
 
 	points_strength_slider.EnableWindow(val);
 	points_NumPointEdit.EnableWindow(val);
@@ -138,6 +144,7 @@ void CVoronoiDialog::SetState(int state)
 		attractor_DeleteAttractorButton.EnableWindow(true);
 		attractor_StrengthEdit.EnableWindow(true);
 		attractor_StrengthLabel.EnableWindow(true);
+		attractor_strength_slider.EnableWindow(true);
 		points_strength_slider.EnableWindow(true);
 		points_NumPointEdit.EnableWindow(true);
 		points_GenerateButton.EnableWindow(true);
@@ -255,4 +262,12 @@ void CVoronoiDialog::OnBnClickedHelp()
 {
 	ON_wString cmd = L"! _HelpDlg ";
 	RhinoApp().RunScript( cmd , 0 );
+}
+
+void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	int pos = attractor_strength_slider.GetPos();
+	CString num;
+	num.Format(_T("%d"), pos);
+	attractor_StrengthEdit.SetWindowTextW(num);
 }

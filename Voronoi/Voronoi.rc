@@ -112,8 +112,8 @@ BEGIN
     EDITTEXT        IDC_EDIT1,138,101,26,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "Attractors",IDC_STATIC,16,11,180,72
     PUSHBUTTON      "Add Point Attractor",IDC_BUTTON1,25,42,76,14
-    EDITTEXT        IDC_STRENGTH,94,24,24,13,ES_AUTOHSCROLL
-    LTEXT           "Strength:",IDC_AttractorStrengthLabel,59,25,34,9
+    EDITTEXT        IDC_STRENGTH,65,24,24,13,ES_AUTOHSCROLL
+    LTEXT           "Strength:",IDC_AttractorStrengthLabel,30,25,34,9
     LTEXT           "Overall attractor strength:",IDC_OverallStrengthLabel,23,121,86,8
     PUSHBUTTON      "Delete Attractor",IDC_DELATTRACTOR,110,60,76,14
     PUSHBUTTON      "Add Curve Attractor",IDC_ADDCURVE,110,42,76,14
@@ -134,7 +134,8 @@ BEGIN
     DEFPUSHBUTTON   "Undo Trim",IDC_UNDO_TRIM,299,113,50,14
     PUSHBUTTON      "Help",IDC_HELP,268,142,50,14
     PUSHBUTTON      "Burn Data",IDC_BURN,328,142,50,14
-    CONTROL         "",IDC_STRENGTH_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,107,118,87,16
+    CONTROL         "",IDC_STRENGTH_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,113,118,76,16
+    CONTROL         "",IDC_INDVSTRENGTH_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,93,23,97,15
 END
 
 IDD_HELP_DLG DIALOGEX 0, 0, 186, 93
