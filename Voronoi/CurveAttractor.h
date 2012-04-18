@@ -11,7 +11,7 @@ public:
 	void SetObjRef(CRhinoObjRef aObjRef);
 	CRhinoObjRef GetObjRef(void);
 	const ON_Curve* GetCurve(void);
-
+	bool CheckSurface(const ON_Surface* aSurface);
 	double strength;
 
 private:	

@@ -23,6 +23,7 @@ PointAttractor::PointAttractor(ON_3dPoint aPoint, double aStrength, CRhinoPointO
 	myV = 0.0;
 	surface->GetDomain(0, &u1, &u2);
 	surface->GetDomain(1, &v1, &v2);
+	surface->GetClosestPoint(point, &myU, &myV);
 }
 
 void PointAttractor::Shift(double u, double v, double* uSum, double* vSum, double overallStrength)
@@ -73,10 +74,14 @@ void PointAttractor::Shift(double u, double v, double* uSum, double* vSum, doubl
 	}
 
 	double scaleFactor = RndPointSet::fRand(abs(strength)*(overallStrength/100), abs(strength))/MAX_STRENGTH;
-	//double scaleFactor = strength/MAX_STRENGTH;
 
 	*uSum += (scaleFactor*uDiff);
 	*vSum += (scaleFactor*vDiff);
 
 	//RhinoApp().Print("pt: %f  %f   me: %f  %f   diff: %f  %f   scale:  %f   sums: %f   %f", u, v, myU, myV, uDiff, vDiff, scaleFactor, *uSum, *vSum);
+}
+
+bool PointAttractor::CheckSurface(const ON_Surface* aSurface)
+{
+	return aSurface == surface;
 }

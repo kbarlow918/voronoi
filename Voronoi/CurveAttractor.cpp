@@ -64,3 +64,7 @@ CRhinoObjRef CurveAttractor::GetObjRef(void)
 {
 	return objRef;
 }
+bool CurveAttractor::CheckSurface(const ON_Surface* aSurface)
+{
+	return aSurface == surface;
+}

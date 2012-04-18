@@ -428,17 +428,16 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   mainBrep = ref.Brep();
   surface = obj;
   
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-  RhinoApp().Print("\nErase check");
+  //Erase check and check if the surfaces match
   if(pointAttractors.size() > 0)
   {
 	  //removed deleted attractors
 	  unsigned int j;
 	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
-		  if(&(pointAttractors.at(j).pointObj->Point()) == NULL)
+		  if(&(pointAttractors.at(j).pointObj->Point()) == NULL || !pointAttractors.at(j).CheckSurface(surface))
 		  {
-			  RhinoApp().Print("\nErasing deleted point attractor");
+			  RhinoApp().Print("\nErasing bad point attractor");
 			  pointAttractors.erase(pointAttractors.begin() + j);
 		  }
 	  }
@@ -449,15 +448,14 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	  unsigned int j;
 	  for(j = 0; j < curveAttractors.size(); j++)
 	  {
-		  if(curveAttractors.at(j).GetObjRef().Curve() == NULL)
+		  if(curveAttractors.at(j).GetObjRef().Curve() == NULL || !curveAttractors.at(j).CheckSurface(surface))
 		  {
 			  RhinoApp().Print("\nErasing deleted curve attractor");
 			  curveAttractors.erase(curveAttractors.begin() + j);
 		  }
 	  }
   }
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-  
+    
   if(EvaluateAttractorsManyVectors(context, numPoints, overallStrength))
   {
 	  unsigned int i;
