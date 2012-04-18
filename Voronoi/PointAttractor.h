@@ -6,8 +6,8 @@ public:
 	PointAttractor(void);
 	~PointAttractor(void);
 	PointAttractor(ON_3dPoint aPoint, double aStrength, CRhinoPointObject* aPointObj, const ON_Surface* aSurface);
-	double GetScore(double u, double v);
 	void Shift(double u, double v, double* uSum, double* vSum, double overallStrength);
+	bool CheckSurface(const ON_Surface* aSurface);
 
 	CRhinoPointObject* pointObj;
 	double strength;
@@ -19,5 +19,4 @@ private:
 	double myU, myV;
 	double u1, u2, v1, v2;
 	static const int MAX_STRENGTH = 100;
-	void SetMaxDist();
 };

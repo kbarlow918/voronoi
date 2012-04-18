@@ -409,17 +409,16 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   mainBrep = ref.Brep();
   surface = obj;
   
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-  RhinoApp().Print("\nErase check");
+  //Erase check and check if the surfaces match
   if(pointAttractors.size() > 0)
   {
 	  //removed deleted attractors
 	  unsigned int j;
 	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
-		  if(&(pointAttractors.at(j).pointObj->Point()) == NULL)
+		  if(&(pointAttractors.at(j).pointObj->Point()) == NULL || !pointAttractors.at(j).CheckSurface(surface))
 		  {
-			  RhinoApp().Print("\nErasing deleted point attractor");
+			  RhinoApp().Print("\nErasing bad point attractor");
 			  pointAttractors.erase(pointAttractors.begin() + j);
 		  }
 	  }
@@ -430,15 +429,14 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	  unsigned int j;
 	  for(j = 0; j < curveAttractors.size(); j++)
 	  {
-		  if(curveAttractors.at(j).GetObjRef().Curve() == NULL)
+		  if(curveAttractors.at(j).GetObjRef().Curve() == NULL || !curveAttractors.at(j).CheckSurface(surface))
 		  {
 			  RhinoApp().Print("\nErasing deleted curve attractor");
 			  curveAttractors.erase(curveAttractors.begin() + j);
 		  }
 	  }
   }
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-  
+    
   if(EvaluateAttractorsManyVectors(context, numPoints, overallStrength))
   {
 	  unsigned int i;
@@ -479,7 +477,7 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 		  //RhinoApp().Print(L"p0.u = %f ",u);
 		  //RhinoApp().Print(L"p0.v = %f ",v);
 
-		  RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
+		  //RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 
@@ -511,11 +509,8 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 			  else if(u > u2) u = u2;
 			  if(v < v1) v = v1;
 			  else if(v > v2) v = v2;
-	
-			  /*xValues[i] = (float)(u);		COMMENTED THIS OUT BECAUSE I THINK IT NEEDS TO BE OUTSIDE THE IF
-			  yValues[i] = (float)(v);
-			  p0 = surface->PointAt(u, v);*/ 
 		  }
+		  //add this point to the data set
 		  xValues[i] = (float)(u);
 		  yValues[i] = (float)(v);
 		  p0 = surface->PointAt(u, v);
