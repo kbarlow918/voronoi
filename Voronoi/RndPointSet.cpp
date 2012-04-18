@@ -225,6 +225,9 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  ON_Brep* brep = obj->BrepForm();
 	  ON_SimpleArray<const ON_Curve*> curveArr;
 	  float x1,y1,x2,y2;
+	  struct Site *s1;
+	  struct Site *s2;
+	  struct GraphEdge* ge;
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
@@ -243,7 +246,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
 	  }*/
 
-	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,0); 
+	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,.00001); 
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
@@ -252,33 +255,18 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
 	  }
 	  RhinoApp().Print(L"\n-------------------------------\n");
-	  while(vdg.getNext(x1,y1,x2,y2))
-	  {
-		//RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
-		
-		//start drawing edge
-		//old code, trying to replace with RhinoInterpolatePointsOnSurface
-
-		/*p1 = obj->PointAt( x1, y1);
-		p2 = obj->PointAt( x2, y2);
-		ON_LineCurve l0 = ON_LineCurve(p1, p2);
-		ON_3dVector v0 = ON_3dVector(0,0,1);
-		ON_SimpleArray<ON_Curve*> arr;
-		ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
-
-		if(arr.First() == NULL)
-		{
-			v0 = ON_3dVector(0,0,-1);
-			ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
-			if(arr.First() == NULL)
-			{
-				RhinoApp().Print(L"no projection"); //ideally this should never actually print I believe this is the cause of the gaps
-			}
-		}
-		else
-		{
-			surfaceCurves.push_back(context.m_doc.AddCurveObject(**arr.First()));
-		}*/
+	 
+	  //while(vdg.getNext(x1,y1,x2,y2,s1,s2))
+	  while((ge = vdg.getNext2()))
+	  {	
+		  x1 = ge->x1;
+		  y1 = ge->y1;
+		  x2 = ge->x2;
+		  y2 = ge->y2;
+		  s1 = ge->reg[0]; //bisected points
+		  s2 = ge->reg[1]; 
+		//RhinoApp().Print(L"%f,%f \t||\t %f,%f\n",s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
+		//RhinoApp().Print(L"here\n");
 		ON_SimpleArray<ON_2dPoint> pointArr;
 		ON_2dPoint first = ON_2dPoint(x1,y1);
 		ON_2dPoint second = ON_2dPoint(x2,y2);
@@ -294,18 +282,16 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			cellLines.push_back(temp);
 			if(!drawCellLines)
 				context.m_doc.HideObject(temp);
-		}else
-		{
-			//RhinoApp().Print(L"no projection");
 		}
 
 		//search for closest points
-		 
+		/* 
 		ON_2dPoint midpoint = ON_2dPoint( (x1 + x2) / 2, (y1+ y2) / 2 );
 		//ON_2dPoint side1, side2;
 		double dist1 = DBL_MAX, dist2 = DBL_MAX, currdist;
 		int point1 =0, point2 =0;
 		//RhinoApp().Print(L"HERE2");
+		
 		for(int i=0; i<vsize; i++)
 		{
 			
@@ -329,11 +315,12 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		rndPoints.at(point1).Append(offsetPoint);
 		offsetPoint = ON_2dPoint( (midpoint.x + xValues[point2])/2, (midpoint.y + yValues[point2])/2);
 		rndPoints.at(point2).Append(offsetPoint);
-		
+		*/
 	  }
-	  //RhinoApp().Print(L"HERE");
+	  //RhinoApp().Print(L"HERE2");
+	  
 	  //draw trim curves
-	  for(int i=0; i<vsize; i++)
+	 /* for(int i=0; i<vsize; i++)
       {
 			currentCenter = i;
 			rndPoints.at(i).QuickSort(&sortPoints);
@@ -350,7 +337,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			ON_BrepTrim& trim = brep->NewTrim( brep->m_E[ei], bRev3d, loop, c2i );
 			*/
 				
-			
+		/*	
 			if(item != NULL)
 			{
 				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
@@ -361,14 +348,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				//RhinoApp().Print(L"no projection");
 			}
 	  }
-	  //context.m_doc.Redraw();
-	  int i = 0;
-	  /*for(i; i<(int)cellBorderList.size();i++)
-	  {
-			cb = cellBorderList.at(i);
-			cb.findConnected(cellBorderList);
-	  }
-	  RhinoApp().Print(L"Found connected subsets");*/
+	  //RhinoApp().Print(L"HERE3");
+	  
 	  ON_Brep* split = RhinoSplitBrepFace(*mainBrep, 0 , curveArr, .01, true);
 	  if (split==NULL)
 	  {
@@ -378,7 +359,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  RhinoApp().Print(L"split worked");
 		  context.m_doc.AddBrepObject(*split);
 	  }
-
+*/
 	  delete(xValues);
 	  delete(yValues);
 	  context.m_doc.Redraw();

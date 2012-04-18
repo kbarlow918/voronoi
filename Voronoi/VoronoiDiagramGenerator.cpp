@@ -31,6 +31,8 @@
 #include <algorithm>
 
 float thisborderMinX, thisborderMaxX, thisborderMinY, thisborderMaxY;
+Point *p0;
+Point *p1;
 VoronoiDiagramGenerator::VoronoiDiagramGenerator()
 {
 	siteidx = 0;
@@ -54,17 +56,107 @@ VoronoiDiagramGenerator::~VoronoiDiagramGenerator()
 		delete allMemoryList;
 }
 
-
+//for sorting edge points into their proper order before connecting them
 int EdgeCompare(const void * a, const void * b) //relation of a to b; less = -1; same = 0; more = 1
 {
 	if(!a){return 1;}
 	if(!b){return -1;}
-	Point *p0 = (Point*)a;
-	Point *p1 = (Point*)b;
+	p0 = (Point*)a;
+	p1 = (Point*)b;
 	if(p0->y == thisborderMinY){if(p0->x < p1->x){return -1;}else{return (p0->x > p1->x);}}
 	if(p0->x == thisborderMaxX){if(p0->y < p1->y){return -1;}else{return (p0->y > p1->y);}}
 	if(p0->y == thisborderMaxY){if(p1->x < p0->x){return -1;}else{return (p1->x > p0->x);}}
 	if(p0->x == thisborderMinX){if(p1->x < p0->x){return -1;}else{return (p1->x > p0->x);}}
+}
+void VoronoiDiagramGenerator::CloseEdges()
+{
+	RhinoApp().Print(L"\n close edges\n");
+	float x1,y1,x2,y2;
+	Site *s1;
+	Site *s2;
+	Point* bpln = (Point*)malloc((numedges/3) * sizeof(Point));
+	Point* bpls = (Point*)malloc((numedges/3) * sizeof(Point));
+	Point* bple = (Point*)malloc((numedges/3) * sizeof(Point));
+	Point* bplw = (Point*)malloc((numedges/3) * sizeof(Point));
+
+	resetIterator();
+	Point* pe, pr;
+	int north=0;
+	int south=0;
+	int east=0;
+	int west=0;
+	int total;
+	int z,q, elements;
+	while(getNext(x1,y1,x2,y2,s1,s2))
+	{
+		if(x1 == borderMinX){bplw[west].x = x1; bplw[west].y = y1; west++;}
+		if(x2 == borderMinX){bplw[west].x = x2; bplw[west].y = y2; west++;}
+		if(x1 == borderMaxX){bple[east].x = x1; bple[east].y = y1; east++;}
+		if(x2 == borderMaxX){bple[east].x = x2; bple[east].y = y2; east++;}
+		if(y1 == borderMinY){bpls[south].x = x1; bpls[south].y = y1; south++;}
+		if(y2 == borderMinY){bpls[south].x = x2; bpls[south].y = y2; south++;}
+		if(y1 == borderMaxY){bpln[north].x = x1; bpln[north].y = y1; north++;}
+		if(y2 == borderMaxY){bpln[north].x = x2; bpln[north].y = y2; north++;}
+	}
+	total = (north+south+east+west+4);
+	//RhinoApp().Print(L"\n sorting: total = %d \n",total);
+	
+	/*elements = sizeof(bpln) / sizeof(bpln[0]); 
+		std::sort(bpln, bpln + elements, EdgeCompare);
+	elements = sizeof(bpls) / sizeof(bpls[0]); 
+		std::sort(bpls, bpls + elements, EdgeCompare);
+	elements = sizeof(bple) / sizeof(bple[0]); 
+		std::sort(bple, bple + elements, EdgeCompare);
+	elements = sizeof(bplw) / sizeof(bplw[0]); 
+		std::sort(bplw, bplw + elements, EdgeCompare);*/
+	qsort(bpln,north,sizeof(Point),EdgeCompare);
+	qsort(bpls,south,sizeof(Point),EdgeCompare);
+	qsort(bple,east,sizeof(Point),EdgeCompare);
+	qsort(bplw,west,sizeof(Point),EdgeCompare);
+
+	Point northwest, northeast, southeast, southwest;
+	southwest.x = borderMinX; southwest.y = borderMinY;
+	southeast.x = borderMaxX; southeast.y = borderMinY;
+	northwest.x = borderMinX; northwest.y = borderMaxY;
+	northeast.x = borderMaxX; northeast.y = borderMaxY;
+	Point* bplt = (Point*)malloc(total * sizeof(Point));
+	//RhinoApp().Print(L"\n filling pblt\n");
+	q=0;
+	bplt[q] = southwest; q++;
+	//for(z=0; z<south; z++){if(bplt[z].x || bplt[z].y){bplt[q] = bpls[z]; q++;}else{RhinoApp().Print(L"\nS NULL LEAK\n");}}
+	for(z=0; z<south; z++){bplt[q] = bpls[z]; q++;}
+	bplt[q] = southeast; q++;
+	//for(z=0; z<east; z++) {if(bplt[z].x || bplt[z].y){bplt[q] = bple[z]; q++;}else{RhinoApp().Print(L"\nE NULL LEAK\n");}}
+	for(z=0; z<east; z++) {bplt[q] = bple[z]; q++;}
+	bplt[q] = northeast; q++;
+	//for(z=0; z<north; z++){if(bplt[z].x || bplt[z].y){bplt[q] = bpln[z]; q++;}else{RhinoApp().Print(L"\nN NULL LEAK\n");}}
+	for(z=0; z<north; z++){bplt[q] = bpln[z]; q++;}
+	bplt[q] = northwest; q++;
+	//for(z=0; z<west; z++) {if(bplt[z].x || bplt[z].y){bplt[q] = bplw[z]; q++;}else{RhinoApp().Print(L"\nW NULL LEAK\n");}}
+	for(z=0; z<west; z++) {bplt[q] = bplw[z]; q++;}
+	bplt[q] = southwest;
+
+	for(int e=1; e<=total; e++)
+	{
+			bplt[e-1];
+			bplt[e];
+			//RhinoApp().Print(L"pushing edge: e = %d : %f,%f -> %f,%f \n",e,bplt[e-1].x,bplt[e-1].y,bplt[e].x, bplt[e].y);
+			pushGraphEdge(bplt[e-1].x, bplt[e-1].y, bplt[e].x,bplt[e].y,NULL,NULL);
+			/*if((bplt[e-1].x || bplt[e-1].y) && (bplt[e].x || bplt[e].y))
+			{
+		RhinoApp().Print(L"pushing edge: e = %d : %f,%f -> %f,%f \n",e,bplt[e-1].x,bplt[e-1].y,bplt[e].x, bplt[e].y);
+				pushGraphEdge(bplt[e-1].x, bplt[e-1].y, bplt[e].x,bplt[e].y);
+			}
+			else
+			{
+				RhinoApp().Print(L"\n NULL LEAK\n");
+			}*/
+	}	
+	free(bpln);
+	free(bpls);
+	free(bple);
+	free(bplw);
+	free(bplt);
 }
 bool VoronoiDiagramGenerator::generateVoronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist)
 {
@@ -141,95 +233,13 @@ bool VoronoiDiagramGenerator::generateVoronoi(float *xValues, float *yValues, in
 	
 	siteidx = 0;
 	voronoi(triangulate);
-	//close edges;
-	RhinoApp().Print(L"\n close edges\n");
-	float x1,y1,x2,y2;
-	Point* bpln = (Point*)malloc((numedges/2) * sizeof(Point));
-	Point* bpls = (Point*)malloc((numedges/2) * sizeof(Point));
-	Point* bple = (Point*)malloc((numedges/2) * sizeof(Point));
-	Point* bplw = (Point*)malloc((numedges/2) * sizeof(Point));
-
-	resetIterator();
-	Point* pe, pr;
-	int north=0;
-	int south=0;
-	int east=0;
-	int west=0;
-	int total;
-	int z,q, elements;
-	while(getNext(x1,y1,x2,y2))
-	{
-		if(x1 == borderMinX){bplw[west].x = x1; bplw[west].y = y1; west++;}
-		if(x2 == borderMinX){bplw[west].x = x2; bplw[west].y = y2; west++;}
-		if(x1 == borderMaxX){bple[east].x = x1; bple[east].y = y1; east++;}
-		if(x2 == borderMaxX){bple[east].x = x2; bple[east].y = y2; east++;}
-		if(y1 == borderMinY){bpls[south].x = x1; bpls[south].y = y1; south++;}
-		if(y2 == borderMinY){bpls[south].x = x2; bpls[south].y = y2; south++;}
-		if(y1 == borderMaxY){bpln[north].x = x1; bpln[north].y = y1; north++;}
-		if(y2 == borderMaxY){bpln[north].x = x2; bpln[north].y = y2; north++;}
-	}
-	total = (north+south+east+west+4);
-	//RhinoApp().Print(L"\n sorting: total = %d \n",total);
-	
-	/*elements = sizeof(bpln) / sizeof(bpln[0]); 
-		std::sort(bpln, bpln + elements, EdgeCompare);
-	elements = sizeof(bpls) / sizeof(bpls[0]); 
-		std::sort(bpls, bpls + elements, EdgeCompare);
-	elements = sizeof(bple) / sizeof(bple[0]); 
-		std::sort(bple, bple + elements, EdgeCompare);
-	elements = sizeof(bplw) / sizeof(bplw[0]); 
-		std::sort(bplw, bplw + elements, EdgeCompare);*/
-	qsort(bpln,north,sizeof(Point),EdgeCompare);
-	qsort(bpls,south,sizeof(Point),EdgeCompare);
-	qsort(bple,east,sizeof(Point),EdgeCompare);
-	qsort(bplw,west,sizeof(Point),EdgeCompare);
-
-	Point northwest, northeast, southeast, southwest;
-	southwest.x = borderMinX; southwest.y = borderMinY;
-	southeast.x = borderMaxX; southeast.y = borderMinY;
-	northwest.x = borderMinX; northwest.y = borderMaxY;
-	northeast.x = borderMaxX; northeast.y = borderMaxY;
-	Point* bplt = (Point*)malloc(total * sizeof(Point));
-	//RhinoApp().Print(L"\n filling pblt\n");
-	q=0;
-	bplt[q] = southwest; q++;
-	//for(z=0; z<south; z++){if(bplt[z].x || bplt[z].y){bplt[q] = bpls[z]; q++;}else{RhinoApp().Print(L"\nS NULL LEAK\n");}}
-	for(z=0; z<south; z++){bplt[q] = bpls[z]; q++;}
-	bplt[q] = southeast; q++;
-	//for(z=0; z<east; z++) {if(bplt[z].x || bplt[z].y){bplt[q] = bple[z]; q++;}else{RhinoApp().Print(L"\nE NULL LEAK\n");}}
-	for(z=0; z<east; z++) {bplt[q] = bple[z]; q++;}
-	bplt[q] = northeast; q++;
-	//for(z=0; z<north; z++){if(bplt[z].x || bplt[z].y){bplt[q] = bpln[z]; q++;}else{RhinoApp().Print(L"\nN NULL LEAK\n");}}
-	for(z=0; z<north; z++){bplt[q] = bpln[z]; q++;}
-	bplt[q] = northwest; q++;
-	//for(z=0; z<west; z++) {if(bplt[z].x || bplt[z].y){bplt[q] = bplw[z]; q++;}else{RhinoApp().Print(L"\nW NULL LEAK\n");}}
-	for(z=0; z<west; z++) {bplt[q] = bplw[z]; q++;}
-	bplt[q] = southwest;
-
-	for(int e=1; e<=total; e++)
-	{
-			bplt[e-1];
-			bplt[e];
-			//RhinoApp().Print(L"pushing edge: e = %d : %f,%f -> %f,%f \n",e,bplt[e-1].x,bplt[e-1].y,bplt[e].x, bplt[e].y);
-			pushGraphEdge(bplt[e-1].x, bplt[e-1].y, bplt[e].x,bplt[e].y);
-			/*if((bplt[e-1].x || bplt[e-1].y) && (bplt[e].x || bplt[e].y))
-			{
-		RhinoApp().Print(L"pushing edge: e = %d : %f,%f -> %f,%f \n",e,bplt[e-1].x,bplt[e-1].y,bplt[e].x, bplt[e].y);
-				pushGraphEdge(bplt[e-1].x, bplt[e-1].y, bplt[e].x,bplt[e].y);
-			}
-			else
-			{
-				RhinoApp().Print(L"\n NULL LEAK\n");
-			}*/
-	}	
-	free(bpln);
-	free(bpls);
-	free(bple);
-	free(bplw);
-	free(bplt);
-	//RhinoApp().Print(L"\n returning\n");
+	//CloseEdges();
+	//cleanup();
+	RhinoApp().Print(L"\n returning\n");
 	return true;
 }
+
+
 
 bool VoronoiDiagramGenerator::ELinitialize()
 {
@@ -405,7 +415,7 @@ struct Edge * VoronoiDiagramGenerator::bisect(struct Site *s1,struct	Site *s2)
 	struct Edge *newedge;	
 
 	newedge = (struct Edge *) getfree(&efl);
-	
+	newedge->ignore = 0;
 	newedge -> reg[0] = s1; //store the sites that this edge is bisecting
 	newedge -> reg[1] = s2;
 	ref(s1); 
@@ -433,6 +443,7 @@ struct Edge * VoronoiDiagramGenerator::bisect(struct Site *s1,struct	Site *s2)
 	//printf("\nbisect(%d) ((%f,%f) and (%f,%f)",nedges,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
 	
 	nedges += 1;
+	edges.push_back(newedge);
 	return(newedge);
 }
 
@@ -539,10 +550,10 @@ void VoronoiDiagramGenerator::endpoint(struct Edge *e,int lr,struct Site * s)
 		return;
 
 	clip_line(e);
-
-	deref(e->reg[le]);
-	deref(e->reg[re]);
-	makefree((Freenode*)e, &efl);
+	//RhinoApp().Print(L"\n clip line deref\n");
+	//deref(e->reg[le]);
+	//deref(e->reg[re]);
+	//makefree((Freenode*)e, &efl);
 }
 
 
@@ -759,7 +770,7 @@ void VoronoiDiagramGenerator::cleanupEdges()
 
 }
 
-void VoronoiDiagramGenerator::pushGraphEdge(float x1, float y1, float x2, float y2)
+void VoronoiDiagramGenerator::pushGraphEdge(float x1, float y1, float x2, float y2, struct Site *s1, struct Site *s2)
 {
 	GraphEdge* newEdge = new GraphEdge;
 	newEdge->next = allEdges;
@@ -768,6 +779,8 @@ void VoronoiDiagramGenerator::pushGraphEdge(float x1, float y1, float x2, float 
 	newEdge->y1 = y1;
 	newEdge->x2 = x2;
 	newEdge->y2 = y2;
+	newEdge->reg[0] = s1;
+	newEdge->reg[1] = s2;
 	numedges++;
 }
 
@@ -784,9 +797,9 @@ char * VoronoiDiagramGenerator::myalloc(unsigned n)
 /* for those who don't have Cherry's plot */
 /* #include <plot.h> */
 void VoronoiDiagramGenerator::openpl(){}
-void VoronoiDiagramGenerator::line(float x1, float y1, float x2, float y2)
+void VoronoiDiagramGenerator::line(float x1, float y1, float x2, float y2, struct Site *s1, struct Site *s2)
 {	
-	pushGraphEdge(x1,y1,x2,y2);
+	pushGraphEdge(x1,y1,x2,y2,s1,s2);
 
 }
 void VoronoiDiagramGenerator::circle(float x, float y, float radius){}
@@ -859,6 +872,7 @@ void VoronoiDiagramGenerator::clip_line(struct Edge *e)
 	//the square root of 2, then ignore it
 	if(sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1))) < minDistanceBetweenSites)
 	{
+		e->ignore = 1;
 		return;
 	}
 	pxmin = borderMinX;
@@ -905,6 +919,7 @@ void VoronoiDiagramGenerator::clip_line(struct Edge *e)
 		if (((x1> pxmax) & (x2>pxmax)) | ((x1<pxmin)&(x2<pxmin))) 
 		{
 			//printf("\nClipLine jumping out(3), x1 = %f, pxmin = %f, pxmax = %f",x1,pxmin,pxmax);
+			e->ignore = 1;
 			return;
 		}
 		if(x1> pxmax)
@@ -941,6 +956,7 @@ void VoronoiDiagramGenerator::clip_line(struct Edge *e)
 		if (((y1> pymax) & (y2>pymax)) | ((y1<pymin)&(y2<pymin))) 
 		{
 			//printf("\nClipLine jumping out(6), y1 = %f, pymin = %f, pymax = %f",y2,pymin,pymax);
+			e->ignore = 1;
 			return;
 		}
 		if(y1> pymax)
@@ -952,9 +968,14 @@ void VoronoiDiagramGenerator::clip_line(struct Edge *e)
 		if(y2<pymin)
 		{	y2 = pymin; x2 = (e -> c - y2)/e -> a;};
 	};
+	//RhinoApp().Print(L"\nPushing line (%f,%f,%f,%f || %f,%f,%f,%f)",x1,y1,x2,y2,e->reg[0]->coord.x,e->reg[0]->coord.y,e->reg[1]->coord.x,e->reg[1]->coord.y);
 	
-	//printf("\nPushing line (%f,%f,%f,%f)",x1,y1,x2,y2);
-	line(x1,y1,x2,y2);
+	//printf("\nfrom edge (%f,%f,%f,%f)",e->ep[0]->coord.x,e->ep[0]->coord.y,e->ep[1]->coord.x,e->ep[1]->coord.y);
+	//e->ep[0]->coord.x = x1;
+	//e->ep[0]->coord.y = y1;
+	//e->ep[1]->coord.x = x2;
+	//e->ep[1]->coord.y = y2;
+	line(x1,y1,x2,y2,e->reg[0],e->reg[1]);
 }
 
 
@@ -1078,7 +1099,7 @@ bool VoronoiDiagramGenerator::voronoi(int triangulate)
 		clip_line(e);
 	};
 
-	cleanup();
+	//cleanup();
 
 	return true;
 	
