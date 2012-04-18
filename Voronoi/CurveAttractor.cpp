@@ -18,16 +18,6 @@ CurveAttractor::~CurveAttractor(void)
 {
 }
 
-double CurveAttractor::GetScore(double u, double v, ON_3dPoint aPoint)
-{
-	PointAttractor pa;
-	GetClosestPointAttractor(aPoint, &pa);
-	if(&pa != NULL)
-		return pa.GetScore(u, v);
-
-	RhinoApp().Print("\nError during curve attractor score evaluation");
-	return 0.0;
-}
 
 void CurveAttractor::GetClosestPointAttractor(ON_3dPoint aPoint, PointAttractor *pa)
 {
