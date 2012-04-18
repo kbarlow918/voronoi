@@ -498,7 +498,7 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 		  //RhinoApp().Print(L"p0.u = %f ",u);
 		  //RhinoApp().Print(L"p0.v = %f ",v);
 
-		  RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
+		  //RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
 		  //RhinoApp().Print(L"p0.u = %f\n",u);
 		  //RhinoApp().Print(L"p0.v = %f\n",v);
 
@@ -530,11 +530,8 @@ bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& cont
 			  else if(u > u2) u = u2;
 			  if(v < v1) v = v1;
 			  else if(v > v2) v = v2;
-	
-			  /*xValues[i] = (float)(u);		COMMENTED THIS OUT BECAUSE I THINK IT NEEDS TO BE OUTSIDE THE IF
-			  yValues[i] = (float)(v);
-			  p0 = surface->PointAt(u, v);*/ 
 		  }
+		  //add this point to the data set
 		  xValues[i] = (float)(u);
 		  yValues[i] = (float)(v);
 		  p0 = surface->PointAt(u, v);
