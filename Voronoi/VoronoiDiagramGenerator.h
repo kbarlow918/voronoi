@@ -145,7 +145,7 @@ public:
 		return ge;
 	}
 
-	bool getNext(float& x1, float& y1, float& x2, float& y2, struct Site* s1, struct Site* s2)
+	bool getNext(float& x1, float& y1, float& x2, float& y2)
 	{
 		if(iteratorEdges == 0)
 		{
@@ -156,8 +156,6 @@ public:
 		x2 = iteratorEdges->x2;
 		y1 = iteratorEdges->y1;
 		y2 = iteratorEdges->y2;
-		s1 = iteratorEdges->reg[0];
-		s2 = iteratorEdges->reg[1];
 		//RhinoApp().Print(L"s1: %f,%f\n",iteratorEdges->reg[0]->coord.x,iteratorEdges->reg[0]->coord.y);
 		//RhinoApp().Print(L"s2: %f,%f\n",iteratorEdges->reg[1]->coord.x,iteratorEdges->reg[1]->coord.y);
 		iteratorEdges = iteratorEdges->next;

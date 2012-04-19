@@ -246,7 +246,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
 	  }*/
 
-	  vdg.generateVoronoi(xValues,yValues,vsize, umin, umax, vmin, vmax,.00001); 
+	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, (float)0.00001); 
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
