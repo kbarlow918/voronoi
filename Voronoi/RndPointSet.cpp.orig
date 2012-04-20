@@ -246,7 +246,11 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
 	  }*/
 
+<<<<<<< HEAD
+	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.000001); //the user needs to be able to decide these values
+=======
 	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, (float)0.00001); 
+>>>>>>> 0effb8f7f143b7696c85c81b6d2a33b6972d9a34
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
@@ -377,8 +381,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  context.m_doc.AddBrepObject(*split);
 	  }
 */
-	  //delete(xValues);
-	  //delete(yValues);
+	  delete(xValues);
+	  delete(yValues);
 	  context.m_doc.Redraw();
 }
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)

@@ -183,7 +183,7 @@ void VoronoiDiagramGenerator::CloseEdges()
 			pushGraphEdge(bplt[e-1].x, bplt[e-1].y, bplt[e].x,bplt[e].y,NULL,NULL);
 	}
 	RhinoApp().Print(L"e: %d\n",e);
-	free(bplt);
+	//free(bplt);
 }
 bool VoronoiDiagramGenerator::generateVoronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist)
 {
