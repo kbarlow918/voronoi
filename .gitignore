@@ -27,3 +27,7 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+
+Voronoi/PseudoDebug/vc80.idb
+Voronoi/PseudoDebug/BuildLog.htm
+Voronoi/PseudoDebug/Voronoi_pd.rhp.embed.manifest

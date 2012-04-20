@@ -722,7 +722,7 @@ char * VoronoiDiagramGenerator::getfree(struct Freelist *fl)
 
 	if(fl->head == (struct Freenode *) NULL)
 	{	
-		t =  (struct Freenode *) myalloc(sqrt_nsites * fl->nodesize);
+		t =  (struct Freenode *) myalloc(2 *sqrt_nsites * fl->nodesize);
 
 		if(t == 0)
 			return 0;

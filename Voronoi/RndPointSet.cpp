@@ -220,6 +220,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
 {
+	//AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
@@ -250,10 +251,10 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
-	  /*for(int i=0; i<vsize; i++)
+	  for(int i=0; i<vsize; i++)
 	  {
 		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
-	  }*/
+	  }
 	  RhinoApp().Print(L"\n-------------------------------\n");
 	 
 	  //while(vdg.getNext(x1,y1,x2,y2,s1,s2))
@@ -271,13 +272,66 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  s1 = ge->reg[0]; //bisected points
 		  s2 = ge->reg[1]; 
 		  //RhinoApp().Print(L"here\n");
-		  RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f \t || \t %d, %d\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y, s1->sitenbr, s2->sitenbr);
+		  //RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f \t || \t %d, %d\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y, s1->sitenbr, s2->sitenbr);
+		  //RhinoApp().Print(L"%d, %d\n", s1.sitenbr, s2.sitenbr);
 		 
-		//ON_SimpleArray<ON_2dPoint> pointArr;
-		//ON_2dPoint first = ON_2dPoint(x1,y1);
-		//ON_2dPoint second = ON_2dPoint(x2,y2);
-		first = ON_2dPoint(x1,y1);
-		second = ON_2dPoint(x2,y2);
+			first = ON_2dPoint(x1, y1);
+			second = ON_2dPoint(x2, y2);
+			//create a cached dictionary mapping site # to point
+			//otherwise search
+		  if(s1 != NULL)
+		  {
+			  //RhinoApp().Print(L"S1:%d\n", s1->sitenbr);
+				float u = s1->coord.x;
+				float v = s1->coord.y;
+				int index = -1;
+				//search for matching random point
+				for(int i=0; i<vsize; i++)
+				{
+					if(xValues[i] == u && yValues[i] == v)
+					{
+						//found match
+						index = i;
+						break;
+					}
+				}
+				if(index == -1)
+				{
+					//no match found
+					RhinoApp().Print(L"No matching point");
+				}else
+				{
+					ON_2dPoint offsetPoint = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					rndPoints.at(index).Append(offsetPoint);
+				}
+		  }
+		  if(s2 != NULL)
+		  {
+			  //RhinoApp().Print(L"S2:%d\n", s2->sitenbr);
+			  float u = s2->coord.x;
+				float v = s2->coord.y;
+				int index = -1;
+				//search for matching random point
+				for(int i=0; i<vsize; i++)
+				{
+					if(xValues[i] == u && yValues[i] == v)
+					{
+						//found match
+						index = i;
+						break;
+					}
+				}
+				if(index == -1)
+				{
+					//no match found
+					RhinoApp().Print(L"No matching point");
+				}else
+				{
+					ON_2dPoint offsetPoint = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					rndPoints.at(index).Append(offsetPoint);
+				}
+		  }
+		
 		//cb = CellBorder(first, second);
 		//RhinoApp().Print(L"HERE");
 		pointArr.Append(first);
@@ -294,7 +348,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			if(!drawCellLines)
 				context.m_doc.HideObject(temp);
 		}
-		context.m_doc.Redraw();
+		//context.m_doc.Redraw();
 		//RhinoApp().Print(L"HERE3");
 		//first = NULL;
 		//second = NULL;
@@ -337,7 +391,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  //RhinoApp().Print(L"HERE2");
 	  
 	  //draw trim curves
-	 /* for(int i=0; i<vsize; i++)
+	  for(int i=0; i<vsize; i++)
       {
 			currentCenter = i;
 			rndPoints.at(i).QuickSort(&sortPoints);
@@ -354,7 +408,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			ON_BrepTrim& trim = brep->NewTrim( brep->m_E[ei], bRev3d, loop, c2i );
 			*/
 				
-		/*	
+		
 			if(item != NULL)
 			{
 				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
@@ -367,7 +421,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  }
 	  //RhinoApp().Print(L"HERE3");
 	  
-*/
+
 	  //delete(xValues);
 	  //delete(yValues);
 	  context.m_doc.Redraw();
