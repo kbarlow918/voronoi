@@ -231,7 +231,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
-	  CellBorder cb;
+	  //CellBorder cb;
 	  double umin, umax, vmin, vmax;
 	  obj->GetDomain(0, &umin, &umax);
 	  obj->GetDomain(1, &vmin, &vmax);
@@ -250,13 +250,18 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
-	  for(int i=0; i<vsize; i++)
+	  /*for(int i=0; i<vsize; i++)
 	  {
 		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
-	  }
+	  }*/
 	  RhinoApp().Print(L"\n-------------------------------\n");
 	 
 	  //while(vdg.getNext(x1,y1,x2,y2,s1,s2))
+	  ON_SimpleArray<ON_2dPoint> pointArr;
+	  ON_2dPoint first;
+	  ON_2dPoint second;
+	  ON_Curve* item;
+	  CRhinoCurveObject* temp;
 	  while((ge = vdg.getNext2()))
 	  {	
 		  x1 = ge->x1;
@@ -265,25 +270,36 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  y2 = ge->y2;
 		  s1 = ge->reg[0]; //bisected points
 		  s2 = ge->reg[1]; 
-		//RhinoApp().Print(L"%f,%f \t||\t %f,%f\n",s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
-		//RhinoApp().Print(L"here\n");
-		ON_SimpleArray<ON_2dPoint> pointArr;
-		ON_2dPoint first = ON_2dPoint(x1,y1);
-		ON_2dPoint second = ON_2dPoint(x2,y2);
-		cb = CellBorder(first, second);
-
+		  RhinoApp().Print(L"here\n");
+		  //RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
+		 
+		//ON_SimpleArray<ON_2dPoint> pointArr;
+		//ON_2dPoint first = ON_2dPoint(x1,y1);
+		//ON_2dPoint second = ON_2dPoint(x2,y2);
+		first = ON_2dPoint(x1,y1);
+		second = ON_2dPoint(x2,y2);
+		//cb = CellBorder(first, second);
+		//RhinoApp().Print(L"HERE");
 		pointArr.Append(first);
 		pointArr.Append(second);		
-		cellBorderList.push_back(cb);
-		ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
+		//cellBorderList.push_back(cb);
+		//ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
+		item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
+		//RhinoApp().Print(L"HERE2");
 		if(item != NULL)//draw the cells
 		{
-			CRhinoCurveObject* temp = context.m_doc.AddCurveObject(*item);
+			//CRhinoCurveObject* temp = context.m_doc.AddCurveObject(*item);
+			temp = context.m_doc.AddCurveObject(*item);
 			cellLines.push_back(temp);
 			if(!drawCellLines)
 				context.m_doc.HideObject(temp);
 		}
-
+		context.m_doc.Redraw();
+		//RhinoApp().Print(L"HERE3");
+		//first = NULL;
+		//second = NULL;
+		pointArr.Destroy();
+		//RhinoApp().Print(L"HERE4\n");
 		//search for closest points
 		/* 
 		ON_2dPoint midpoint = ON_2dPoint( (x1 + x2) / 2, (y1+ y2) / 2 );
@@ -317,6 +333,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		rndPoints.at(point2).Append(offsetPoint);
 		*/
 	  }
+	  RhinoApp().Print(L"end while");
 	  //RhinoApp().Print(L"HERE2");
 	  
 	  //draw trim curves
