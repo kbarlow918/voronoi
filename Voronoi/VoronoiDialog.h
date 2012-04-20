@@ -71,4 +71,5 @@ public:
 	
 	CSliderCtrl attractor_strength_slider;
 	afx_msg void OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedTrim();
 };

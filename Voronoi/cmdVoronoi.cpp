@@ -632,3 +632,42 @@ CRhinoCommand::result CCommandHelpDlg::RunCommand( const CRhinoCommandContext& c
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN TrimBrep command
+//
+
+class CCommandTrimBrep : public CRhinoCommand
+{
+public:
+	CCommandTrimBrep() {}
+	~CCommandTrimBrep() {}
+	UUID CommandUUID()
+	{
+		// {E14CFA4E-4DC4-418B-9E99-0B753094F40B}
+		static const GUID TrimBrepCommand_UUID =
+		{ 0xE14CFA4E, 0x4DC4, 0x418B, { 0x9E, 0x99, 0x0B, 0x75, 0x30, 0x94, 0xF4, 0x0B } };
+		return TrimBrepCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"TrimBrep"; }
+	const wchar_t* LocalCommandName() { return L"TrimBrep"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandTrimBrep object
+static class CCommandTrimBrep theTrimBrepCommand;
+
+CRhinoCommand::result CCommandTrimBrep::RunCommand( const CRhinoCommandContext& context )
+{
+	theVoronoiCommand.mySet.TrimBrep(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END TrimBrep command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+

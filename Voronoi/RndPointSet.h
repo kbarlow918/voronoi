@@ -14,6 +14,7 @@ public:
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
+	void TrimBrep( const CRhinoCommandContext& context );
 	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength);
 	void ViewEdit( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength );
@@ -30,6 +31,7 @@ private:
 	std::vector<CRhinoCurveObject*> surfaceCurves;
 	std::vector<CRhinoCurveObject*> cellLines;
 	std::vector<CellBorder> cellBorderList;
+	ON_SimpleArray<const ON_Curve*> curveArr;
 	bool pointsHidden;
 	const ON_Surface* surface;
 	const ON_Brep* mainBrep;
