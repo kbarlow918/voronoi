@@ -407,7 +407,7 @@ CRhinoCommand::result CCommandRunVoronoi::RunCommand( const CRhinoCommandContext
   gn2.GetNumber();
   int rc2 = gn2.CommandResult();
 	
-  bool arg2 = (bool)gn2.Number();
+  float arg2 = (float)gn2.Number();
 
   gn3.SetDefaultNumber( 0 ) ;
   gn3.AcceptNothing();

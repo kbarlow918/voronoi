@@ -224,7 +224,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
-	  
+	  RhinoApp().Print(L"offset: %f", offset);
 	  float x1,y1,x2,y2;
 	  struct Site *s1;
 	  struct Site *s2;
@@ -264,6 +264,14 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  ON_Curve* item;
 	  CRhinoCurveObject* temp;
 	  while((ge = vdg.getNext2()))
+	  {
+		  if(s1 != NULL && s2 != NULL)
+		  {
+			edgeList.push_back(ge);
+		  }
+	  }
+	  vdg.resetIterator();
+	  while((ge = vdg.getNext2()))
 	  {	
 		  x1 = ge->x1;
 		  y1 = ge->y1;
@@ -301,8 +309,21 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					RhinoApp().Print(L"No matching point");
 				}else
 				{
-					ON_2dPoint offsetPoint = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					ON_2dPoint offsetPoint;// = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					//move endpoints along vector towards center point
+					float midx = x1/2 + x2/2;
+					float midy = y1/2 + y2/2;
+					float dist = sqrt(pow((xValues[index] - midx), 2) + pow((yValues[index] - midy), 2));
+					float xvec = (xValues[index] - midx)/dist;
+					float yvec = (yValues[index] - midy)/dist;
+					offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 					rndPoints.at(index).Append(offsetPoint);
+
+					/*dist = sqrt(pow((xValues[index] - x2), 2) + pow((yValues[index] - y2), 2));
+					xvec = (xValues[index] - x2) /dist;
+					yvec = (yValues[index] - y2) /dist;
+					offsetPoint = ON_2dPoint( x2 + xvec * offset, y2 + yvec* offset);
+					rndPoints.at(index).Append(offsetPoint);*/
 				}
 		  }
 		  if(s2 != NULL)
@@ -327,10 +348,28 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					RhinoApp().Print(L"No matching point");
 				}else
 				{
-					ON_2dPoint offsetPoint = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					ON_2dPoint offsetPoint;// = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+					//move endpoints along vector towards center point
+					float midx = x1/2 + x2/2;
+					float midy = y1/2 + y2/2;
+					float dist = sqrt(pow((xValues[index] - midx), 2) + pow((yValues[index] - midy), 2));
+					float xvec = (xValues[index] - midx)/dist;
+					float yvec = (yValues[index] - midy)/dist;
+					offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 					rndPoints.at(index).Append(offsetPoint);
+
+					/*dist = sqrt(pow((xValues[index] - x2), 2) + pow((yValues[index] - y2), 2));
+					xvec = (xValues[index] - x2) /dist;
+					yvec = (yValues[index] - y2) /dist;
+					offsetPoint = ON_2dPoint( x2 + xvec * offset, y2 + yvec* offset);
+					rndPoints.at(index).Append(offsetPoint);*/
 				}
 		  }
+		  if(s1 == NULL && s2 == NULL)
+		  {
+			//search edgelist for matching endpoints
+		  }
+		  
 		
 		//cb = CellBorder(first, second);
 		//RhinoApp().Print(L"HERE");
@@ -348,43 +387,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			if(!drawCellLines)
 				context.m_doc.HideObject(temp);
 		}
-		//context.m_doc.Redraw();
-		//RhinoApp().Print(L"HERE3");
-		//first = NULL;
-		//second = NULL;
 		pointArr.Destroy();
-		//RhinoApp().Print(L"HERE4\n");
-		//search for closest points
-		/* 
-		ON_2dPoint midpoint = ON_2dPoint( (x1 + x2) / 2, (y1+ y2) / 2 );
-		//ON_2dPoint side1, side2;
-		double dist1 = DBL_MAX, dist2 = DBL_MAX, currdist;
-		int point1 =0, point2 =0;
-		//RhinoApp().Print(L"HERE2");
-		
-		for(int i=0; i<vsize; i++)
-		{
-			
-			currdist = sqrt(pow((xValues[i] - midpoint.x), 2) + pow((yValues[i] - midpoint.y), 2));
-			if(currdist < dist1)
-			{
-				point2 = point1;
-				dist2 = dist1;
-				dist1 = currdist;
-				point1 = i;
-			}else if(currdist < dist2)
-			{
-				point2 = i;
-				dist2 = currdist;
-			}else
-			{
-
-			}
-		}
-		ON_2dPoint offsetPoint = ON_2dPoint( (midpoint.x + xValues[point1])/2, (midpoint.y + yValues[point1])/2);
-		rndPoints.at(point1).Append(offsetPoint);
-		offsetPoint = ON_2dPoint( (midpoint.x + xValues[point2])/2, (midpoint.y + yValues[point2])/2);
-		rndPoints.at(point2).Append(offsetPoint);
 		*/
 	  }
 	  RhinoApp().Print(L"end while");

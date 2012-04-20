@@ -3,6 +3,7 @@
 #include "PointAttractor.h"
 #include "CurveAttractor.h"
 #include "CellBorder.h"
+#include "VoronoiDiagramGenerator.h"
 
 class RndPointSet
 {
@@ -30,6 +31,7 @@ private:
 	std::vector<CurveAttractor> curveAttractors;
 	std::vector<CRhinoCurveObject*> surfaceCurves;
 	std::vector<CRhinoCurveObject*> cellLines;
+	std::vector<GraphEdge*> edgeList;
 	std::vector<CellBorder> cellBorderList;
 	ON_SimpleArray<const ON_Curve*> curveArr;
 	bool pointsHidden;
