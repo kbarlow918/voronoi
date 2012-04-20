@@ -219,6 +219,13 @@ void CVoronoiDialog::OnBnClickedViewedit()
 void CVoronoiDialog::OnBnClickedCellGenerate()
 {
 	ON_wString cmd = L"! _RunVoronoi ";
+	CString num;
+	voronoi_MinDistEdit.GetWindowText(num);
+	cmd += (LPCTSTR)num;
+	cmd += " ";
+	voronoi_InnerCurveOffsetEdit.GetWindowText(num);
+	cmd += (LPCTSTR)num;
+	cmd += " ";
 	if(voronoi_DrawCellLines.GetState())
 		cmd += (LPCTSTR)"1";
 	else

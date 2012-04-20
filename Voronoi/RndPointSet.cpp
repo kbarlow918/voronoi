@@ -218,7 +218,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
   }
 }
 
-void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
+void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines, float minDist, float offset)
 {
 	//AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 	//RhinoApp().Print(L"\n in runvoronoi \n");
@@ -247,7 +247,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
 	  }*/
 
-	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, (float)0.00001); 
+	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, minDist); 
 	  vdg.resetIterator();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");

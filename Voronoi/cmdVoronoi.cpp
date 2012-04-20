@@ -393,7 +393,22 @@ static class CCommandRunVoronoi theRunVoronoiCommand;
 
 CRhinoCommand::result CCommandRunVoronoi::RunCommand( const CRhinoCommandContext& context )
 {
-  CRhinoGetNumber gn3;
+  CRhinoGetNumber gn1, gn2, gn3;
+
+  gn1.SetDefaultNumber( 0 ) ;
+  gn1.AcceptNothing();
+  gn1.GetNumber();
+  int rc1 = gn1.CommandResult();
+	
+  float arg1 = (float)gn1.Number();
+
+  gn2.SetDefaultNumber( 0 ) ;
+  gn2.AcceptNothing();
+  gn2.GetNumber();
+  int rc2 = gn2.CommandResult();
+	
+  bool arg2 = (bool)gn2.Number();
+
   gn3.SetDefaultNumber( 0 ) ;
   gn3.AcceptNothing();
   gn3.GetNumber();
@@ -401,7 +416,7 @@ CRhinoCommand::result CCommandRunVoronoi::RunCommand( const CRhinoCommandContext
 	
   bool arg3 = (bool)gn3.Number();
 
-  theVoronoiCommand.mySet.RunVoronoi(context, arg3);
+  theVoronoiCommand.mySet.RunVoronoi(context, arg3, arg1, arg2);
   return CRhinoCommand::success;
 }
 

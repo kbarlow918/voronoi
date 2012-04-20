@@ -9,7 +9,7 @@ class RndPointSet
 public:
 	RndPointSet(void);
 	~RndPointSet(void);
-	void RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines);
+	void RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines, float minDist, float offset);
 	void AddPointAttractor( const CRhinoCommandContext& context, double value );
 	void AddCurveAttractor( const CRhinoCommandContext& context, double value );
 	void BurnData(const CRhinoCommandContext& context);
