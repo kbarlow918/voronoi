@@ -391,7 +391,28 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 						  ge1 = cur;
 					  }
 
-				  }else if(x1 == cur->x1 && y1 == cur->y1)
+				  }else if(x1 == cur->x2 && y1 == cur->y2)
+				  {
+					  if(ge1 != NULL)
+					  {
+						  ge2 = cur;
+						  break;
+					  }else
+					  {
+						  ge1 = cur;
+					  }
+				  }else if(x2 == cur->x1 && y2 == cur->y1)
+				  {
+					  if(ge1 != NULL)
+					  {
+						  ge2 = cur;
+						  break;
+					  }else
+					  {
+						  ge1 = cur;
+					  }
+
+				  }else if(x2 == cur->x2 && y2 == cur->y2)
 				  {
 					  if(ge1 != NULL)
 					  {
@@ -458,7 +479,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 						float yvec = (yValues[index] - midy)/dist;
 						offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 						rndPoints.at(index).Append(offsetPoint);
-
+						ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
+						points.push_back(context.m_doc.AddPointObject(p0));
 						
 					}
 			  }
@@ -495,15 +517,6 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			//rndPoints.at(i).QuickSort(ON_CompareIncreasing);
 			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .01, 0);
 			//trimming code
-			/*
-			ON_BrepLoop& loop = brep->NewLoop( ON_BrepLoop::inner );
-			
-			int c2i, ei=0, bRev3d=0;
-			ON_Surface::ISO iso = ON_Surface::not_iso;
-			c2i = brep->m_C2.Count();
-			brep->m_C2.Append(item);
-			ON_BrepTrim& trim = brep->NewTrim( brep->m_E[ei], bRev3d, loop, c2i );
-			*/
 				
 		
 			if(item != NULL)
@@ -545,7 +558,7 @@ void RndPointSet::TrimBrep( const CRhinoCommandContext& context )
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 {
 	if (p1->x >= 0 && p2->x < 0)
-        return 1;
+        return -1;
     if (p1->x == 0 && p2->x == 0)
         return p1->y > p2->y;
 
