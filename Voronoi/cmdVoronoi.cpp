@@ -134,7 +134,7 @@ static class CCommandRandomPoint theRandomPointCommand;
 
 CRhinoCommand::result CCommandRandomPoint::RunCommand( const CRhinoCommandContext& context )
 {
-	
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
   CRhinoGetNumber gn;
   gn.SetDefaultNumber( 1 ) ;
   gn.AcceptNothing();
@@ -189,6 +189,7 @@ static class CCommandAddPtAttractor theAddPtAttractorCommand;
 
 CRhinoCommand::result CCommandAddPtAttractor::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	  CRhinoGetNumber gn;
 	  gn.SetDefaultNumber( 1.0 ) ;
 	  gn.AcceptNothing();
@@ -234,6 +235,7 @@ static class CCommandDelPtAttractor theDelPtAttractorCommand;
 
 CRhinoCommand::result CCommandDelPtAttractor::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
     theVoronoiCommand.mySet.DeletePointAttractor(context);
 
 	return CRhinoCommand::success;
@@ -273,6 +275,7 @@ static class CCommandAddCurveAttractor theAddCurveAttractorCommand;
 
 CRhinoCommand::result CCommandAddCurveAttractor::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	  CRhinoGetNumber gn;
 	  gn.SetDefaultNumber( 1.0 ) ;
 	  gn.AcceptNothing();
@@ -318,6 +321,7 @@ static class CCommandClearAll theClearAllCommand;
 
 CRhinoCommand::result CCommandClearAll::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.ClearAll(context);
 	return CRhinoCommand::success;
 }
@@ -356,6 +360,7 @@ static class CCommandViewEdit theViewEditCommand;
 
 CRhinoCommand::result CCommandViewEdit::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.ViewEdit(context);
 	return CRhinoCommand::success;
 }
@@ -393,6 +398,7 @@ static class CCommandRunVoronoi theRunVoronoiCommand;
 
 CRhinoCommand::result CCommandRunVoronoi::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
   CRhinoGetNumber gn1, gn2, gn3;
 
   gn1.SetDefaultNumber( 0 ) ;
@@ -453,6 +459,7 @@ static class CCommandTogglePtHide theTogglePtHideCommand;
 
 CRhinoCommand::result CCommandTogglePtHide::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	  CRhinoGetNumber gn3;
 	  gn3.SetDefaultNumber( 0 ) ;
 	  gn3.AcceptNothing();
@@ -498,6 +505,7 @@ static class CCommandUndoCurves theUndoCurvesCommand;
 
 CRhinoCommand::result CCommandUndoCurves::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.UndoCurves(context);
 	return CRhinoCommand::success;
 }
@@ -535,6 +543,7 @@ static class CCommandUndoPoints theUndoPointsCommand;
 
 CRhinoCommand::result CCommandUndoPoints::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.UndoPoints(context);
 	return CRhinoCommand::success;
 }
@@ -572,6 +581,7 @@ static class CCommandBurnData theBurnDataCommand;
 
 CRhinoCommand::result CCommandBurnData::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.BurnData(context);
 	return CRhinoCommand::success;
 }
@@ -609,6 +619,7 @@ static class CCommandHelpDlg theHelpDlgCommand;
 
 CRhinoCommand::result CCommandHelpDlg::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	/*CVoronoiDialog *help = new CVoronoiDialog( theVoronoiCommand.m_dialog );
 	if( help->Create(IDD_HELP_DLG, theVoronoiCommand.m_dialog) )
 	{
@@ -661,6 +672,7 @@ static class CCommandTrimBrep theTrimBrepCommand;
 
 CRhinoCommand::result CCommandTrimBrep::RunCommand( const CRhinoCommandContext& context )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	theVoronoiCommand.mySet.TrimBrep(context);
 	return CRhinoCommand::success;
 }

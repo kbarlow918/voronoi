@@ -58,6 +58,7 @@ CVoronoiApp theApp;
 
 BOOL CVoronoiApp::InitInstance()
 {
+
 	CWinApp::InitInstance();
 
 	return TRUE;

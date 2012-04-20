@@ -265,7 +265,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  CRhinoCurveObject* temp;
 	  while((ge = vdg.getNext2()))
 	  {
-		  if(s1 != NULL && s2 != NULL)
+		  if(ge->reg[0] != NULL && ge->reg[1] != NULL)
 		  {
 			edgeList.push_back(ge);
 		  }
@@ -365,40 +365,45 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					rndPoints.at(index).Append(offsetPoint);*/
 				}
 		  }
+
 		  if(s1 == NULL && s2 == NULL)
 		  {
 			  RhinoApp().Print(L"here border\n");
 			//search edgelist for matching endpoints
-			  struct GraphEdge* first = NULL;
-			  struct GraphEdge* second = NULL;
+			  struct GraphEdge* ge1 = NULL;
+			  struct GraphEdge* ge2 = NULL;
 			  struct GraphEdge* cur = NULL;
 			  for(int j=0; j < edgeList.size(); j++)
 			  {
 				  cur = edgeList.at(j);
-				  if(x1 == cur->x1 && y1 == cur->y1)
+				  if(cur== NULL)
 				  {
-					  if(first != NULL)
+					RhinoApp().Print(L"null graph edge\n");
+				  }
+				  else if(x1 == cur->x1 && y1 == cur->y1)
+				  {
+					  if(ge1 != NULL)
 					  {
-						  second = cur;
+						  ge2 = cur;
 						  break;
 					  }else
 					  {
-						  first = cur;
+						  ge1 = cur;
 					  }
 
 				  }else if(x1 == cur->x1 && y1 == cur->y1)
 				  {
-					  if(first != NULL)
+					  if(ge1 != NULL)
 					  {
-						  second = cur;
+						  ge2 = cur;
 						  break;
 					  }else
 					  {
-						  first = cur;
+						  ge1 = cur;
 					  }
 				  }
 			  }
-			  if(first == NULL || second == NULL)
+			  if(ge1 == NULL || ge2 == NULL)
 			  {
 				RhinoApp().Print(L"Border edge missing connection");
 			  }else
@@ -406,23 +411,23 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				//find the common point
 				  float u, v = 0;
 				  int index = -1;
-				  if(first->reg[0]->coord.x == second->reg[0]->coord.x || first->reg[0]->coord.x == second->reg[1]->coord.x)
+				  if(ge1->reg[0]->coord.x == ge2->reg[0]->coord.x || ge1->reg[0]->coord.x == ge2->reg[1]->coord.x)
 				  {
-					  u = first->reg[0]->coord.x;
-				  }else if(first->reg[1]->coord.x == second->reg[0]->coord.x || first->reg[1]->coord.x == second->reg[1]->coord.x)
+					  u = ge1->reg[0]->coord.x;
+				  }else if(ge1->reg[1]->coord.x == ge2->reg[0]->coord.x || ge1->reg[1]->coord.x == ge2->reg[1]->coord.x)
 				  {
-					  u = first->reg[1]->coord.x;
+					  u = ge1->reg[1]->coord.x;
 				  }else
 				  {
 					  RhinoApp().Print(L"Border edge point mismatch");
 				  }
 
-				  if(first->reg[0]->coord.y == second->reg[0]->coord.y || first->reg[0]->coord.y == second->reg[1]->coord.y)
+				  if(ge1->reg[0]->coord.y == ge2->reg[0]->coord.y || ge1->reg[0]->coord.y == ge2->reg[1]->coord.y)
 				  {
-					  v = first->reg[0]->coord.y;
-				  }else if(first->reg[1]->coord.y == second->reg[0]->coord.y || first->reg[1]->coord.y == second->reg[1]->coord.y)
+					  v = ge1->reg[0]->coord.y;
+				  }else if(ge1->reg[1]->coord.y == ge2->reg[0]->coord.y || ge1->reg[1]->coord.y == ge2->reg[1]->coord.y)
 				  {
-					  v = first->reg[1]->coord.y;
+					  v = ge1->reg[1]->coord.y;
 				  }else
 				  {
 					  RhinoApp().Print(L"Border edge point mismatch");
