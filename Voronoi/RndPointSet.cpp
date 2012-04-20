@@ -220,7 +220,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines, float minDist, float offset)
 {
-	//AFX_MANAGE_STATE( AfxGetStaticModuleState() );
+	  //AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
@@ -367,7 +367,96 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  }
 		  if(s1 == NULL && s2 == NULL)
 		  {
+			  RhinoApp().Print(L"here border\n");
 			//search edgelist for matching endpoints
+			  struct GraphEdge* first = NULL;
+			  struct GraphEdge* second = NULL;
+			  struct GraphEdge* cur = NULL;
+			  for(int j=0; j < edgeList.size(); j++)
+			  {
+				  cur = edgeList.at(j);
+				  if(x1 == cur->x1 && y1 == cur->y1)
+				  {
+					  if(first != NULL)
+					  {
+						  second = cur;
+						  break;
+					  }else
+					  {
+						  first = cur;
+					  }
+
+				  }else if(x1 == cur->x1 && y1 == cur->y1)
+				  {
+					  if(first != NULL)
+					  {
+						  second = cur;
+						  break;
+					  }else
+					  {
+						  first = cur;
+					  }
+				  }
+			  }
+			  if(first == NULL || second == NULL)
+			  {
+				RhinoApp().Print(L"Border edge missing connection");
+			  }else
+			  {
+				//find the common point
+				  float u, v = 0;
+				  int index = -1;
+				  if(first->reg[0]->coord.x == second->reg[0]->coord.x || first->reg[0]->coord.x == second->reg[1]->coord.x)
+				  {
+					  u = first->reg[0]->coord.x;
+				  }else if(first->reg[1]->coord.x == second->reg[0]->coord.x || first->reg[1]->coord.x == second->reg[1]->coord.x)
+				  {
+					  u = first->reg[1]->coord.x;
+				  }else
+				  {
+					  RhinoApp().Print(L"Border edge point mismatch");
+				  }
+
+				  if(first->reg[0]->coord.y == second->reg[0]->coord.y || first->reg[0]->coord.y == second->reg[1]->coord.y)
+				  {
+					  v = first->reg[0]->coord.y;
+				  }else if(first->reg[1]->coord.y == second->reg[0]->coord.y || first->reg[1]->coord.y == second->reg[1]->coord.y)
+				  {
+					  v = first->reg[1]->coord.y;
+				  }else
+				  {
+					  RhinoApp().Print(L"Border edge point mismatch");
+				  }
+
+				  //search for matching random point
+					for(int i=0; i<vsize; i++)
+					{
+						if(xValues[i] == u && yValues[i] == v)
+						{
+							//found match
+							index = i;
+							break;
+						}
+					}
+					if(index == -1)
+					{
+						//no match found
+						RhinoApp().Print(L"No matching point");
+					}else
+					{
+						ON_2dPoint offsetPoint;// = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
+						//move endpoints along vector towards center point
+						float midx = x1/2 + x2/2;
+						float midy = y1/2 + y2/2;
+						float dist = sqrt(pow((xValues[index] - midx), 2) + pow((yValues[index] - midy), 2));
+						float xvec = (xValues[index] - midx)/dist;
+						float yvec = (yValues[index] - midy)/dist;
+						offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
+						rndPoints.at(index).Append(offsetPoint);
+
+						
+					}
+			  }
 		  }
 		  
 		
@@ -388,7 +477,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				context.m_doc.HideObject(temp);
 		}
 		pointArr.Destroy();
-		*/
+		
 	  }
 	  RhinoApp().Print(L"end while");
 	  //RhinoApp().Print(L"HERE2");
@@ -648,7 +737,7 @@ void RndPointSet::ToggleHidePoints(const CRhinoCommandContext& context, bool dra
 void RndPointSet::BurnData(const CRhinoCommandContext& context)
 {
 	rndPoints.clear();
-	cellBorderList.clear();
+	//cellBorderList.clear();
 	pointAttractors.clear();
 	curveAttractors.clear();
 	points.clear();
@@ -686,7 +775,7 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	}
 
 	rndPoints.clear();
-	cellBorderList.clear();
+	//cellBorderList.clear();
 	pointAttractors.clear();
 	curveAttractors.clear();
 	points.clear();
@@ -715,7 +804,7 @@ void RndPointSet::UndoCurves(const CRhinoCommandContext& context)
 	  context.m_doc.DeleteObject(surfaceCurves.at(i));
 	}
 
-	cellBorderList.clear();
+	//cellBorderList.clear();
 	cellLines.clear();
 	surfaceCurves.clear();
 	rndPoints.clear();

@@ -32,7 +32,7 @@ private:
 	std::vector<CRhinoCurveObject*> surfaceCurves;
 	std::vector<CRhinoCurveObject*> cellLines;
 	std::vector<GraphEdge*> edgeList;
-	std::vector<CellBorder> cellBorderList;
+	//std::vector<CellBorder> cellBorderList;
 	ON_SimpleArray<const ON_Curve*> curveArr;
 	bool pointsHidden;
 	const ON_Surface* surface;
