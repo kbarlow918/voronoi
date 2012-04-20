@@ -29,7 +29,7 @@
 #include "StdAfx.h"
 #ifndef VORONOI_DIAGRAM_GENERATOR
 #define VORONOI_DIAGRAM_GENERATOR
-
+#include <vector>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,12 +84,14 @@ struct Edge
 	struct	Site 	*ep[2];
 	struct	Site	*reg[2];
 	int		edgenbr;
+	int ignore;
 
 };
 
 struct GraphEdge
 {
 	float x1,y1,x2,y2;
+	struct	Site	*reg[2];
 	struct GraphEdge* next;
 };
 
@@ -115,6 +117,7 @@ class VoronoiDiagramGenerator
 public:
 	VoronoiDiagramGenerator();
 	~VoronoiDiagramGenerator();
+	std::vector<Edge*> edges;
 
 	bool generateVoronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist=0);
 
@@ -122,27 +125,96 @@ public:
 	{
 		iteratorEdges = allEdges;
 	}
+	struct GraphEdge* getNext2()
+	{
+		if(iteratorEdges == 0)
+		{
+			//RhinoApp().Print(L"No Edges\n");
+			return false;
+		}
+		
+		/*x1 = iteratorEdges->reg[0]->coord.x;
+		x2 = iteratorEdges->reg[1]->coord.x;
+		y1 = iteratorEdges->reg[0]->coord.y;
+		y2 = iteratorEdges->reg[1]->coord.y;
+		//RhinoApp().Print(L"s1: %f,%f\n",iteratorEdges->reg[0]->coord.x,iteratorEdges->reg[0]->coord.y);
+		//RhinoApp().Print(L"s1: %f,%f\n",x1,y1);*/
+		GraphEdge *ge = iteratorEdges;
+		iteratorEdges = iteratorEdges->next;
+
+		return ge;
+	}
 
 	bool getNext(float& x1, float& y1, float& x2, float& y2)
 	{
 		if(iteratorEdges == 0)
 		{
-			RhinoApp().Print(L"No Edges\n");
+			//RhinoApp().Print(L"No Edges\n");
 			return false;
 		}
-
 		x1 = iteratorEdges->x1;
 		x2 = iteratorEdges->x2;
 		y1 = iteratorEdges->y1;
 		y2 = iteratorEdges->y2;
-
+		//RhinoApp().Print(L"s1: %f,%f\n",iteratorEdges->reg[0]->coord.x,iteratorEdges->reg[0]->coord.y);
+		//RhinoApp().Print(L"s2: %f,%f\n",iteratorEdges->reg[1]->coord.x,iteratorEdges->reg[1]->coord.y);
 		iteratorEdges = iteratorEdges->next;
 
+		return true;
+	}
+	Edge * edge;
+	bool getNextRaw(float& x1, float& y1, float& x2, float& y2)
+	{
+		if(edges.size() == 0)
+		{
+			RhinoApp().Print(L"EMPTY\n");
+			return false;
+		}
+		//RhinoApp().Print(L"not empty\n");
+		edge = edges.back();
+		edges.pop_back();
+		while(edge->ignore == 1)
+		{
+			if(edges.size() == 0)
+			{
+				RhinoApp().Print(L"EMPTY\n");
+				return false;
+			}
+			edge = edges.back();
+			edges.pop_back();
+		}
+
+		if(edge->ep[0])
+		{
+			x1 = edge->ep[0]->coord.x;
+			//RhinoApp().Print(L"x1\n");
+			y1 = edge->ep[0]->coord.y;
+		}
+		else
+		{
+			x1 = xmin;
+			y1 = ymin;
+		}
+		if(edge->ep[1])
+		{
+			x2 = edge->ep[1]->coord.x;
+			//RhinoApp().Print(L"x2\n");
+			y2 = edge->ep[1]->coord.y;
+		}
+		else
+		{
+			x2 = x1;
+			y2 = y1;
+		}
+		
+		//RhinoApp().Print(L"popped\n");
 		return true;
 	}
 
 
 private:
+	//int VoronoiDiagramGenerator::EdgeCompare(const void * a, const void * b);
+	void VoronoiDiagramGenerator::CloseEdges();
 	void cleanup();
 	void cleanupEdges();
 	char *getfree(struct Freelist *fl);	
@@ -197,10 +269,10 @@ private:
 	void out_vertex(struct Site *v);
 	struct Site *nextone();
 
-	void pushGraphEdge(float x1, float y1, float x2, float y2);
+	void pushGraphEdge(float x1, float y1, float x2, float y2, struct Site *s1, struct Site *s2);
 
 	void VoronoiDiagramGenerator::openpl();
-	void VoronoiDiagramGenerator::line(float x1, float y1, float x2, float y2);
+	void VoronoiDiagramGenerator::line(float x1, float y1, float x2, float y2, struct Site *s1, struct Site *s2);
 	void VoronoiDiagramGenerator::circle(float x, float y, float radius);
 	void VoronoiDiagramGenerator::range(float minX, float minY, float maxX, float maxY);
 
@@ -208,7 +280,7 @@ private:
 	struct  Freelist	hfl;
 	struct	Halfedge *ELleftend, *ELrightend;
 	int 	ELhashsize;
-
+	int		numedges;
 	int		triangulate, sorted, plot, debug;
 	float	xmin, xmax, ymin, ymax, deltax, deltay;
 

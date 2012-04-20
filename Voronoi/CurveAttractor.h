@@ -1,17 +1,21 @@
 #pragma once
+#include "PointAttractor.h"
 
 class CurveAttractor
 {
 public:
 	CurveAttractor(void);
 	~CurveAttractor(void);
-	CurveAttractor(const ON_Curve* aCurve, double aStrength, const ON_Surface* aSurface);
-	double GetScore(double u, double v, ON_3dPoint aPoint);
-
-	const ON_Curve* curveObj;
+	CurveAttractor(double aStrength, const ON_Surface* aSurface, CRhinoObjRef aObjRef);
+	void GetClosestPointAttractor(ON_3dPoint aPoint, PointAttractor* pa);
+	void SetObjRef(CRhinoObjRef aObjRef);
+	CRhinoObjRef GetObjRef(void);
+	const ON_Curve* GetCurve(void);
+	bool CheckSurface(const ON_Surface* aSurface);
 	double strength;
 
 private:	
 	const ON_Surface* surface;
-
+	const ON_Curve* curveObj;
+	CRhinoObjRef objRef;
 };

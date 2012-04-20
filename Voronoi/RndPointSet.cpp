@@ -5,9 +5,13 @@
 float *xValues;
 float *yValues;
 int vsize = 0;
+int currentCenter = 0;
+std::vector<ON_SimpleArray<ON_2dPoint>> rndPoints;
 RndPointSet::RndPointSet(void)
 {
 	srand((unsigned int)time(NULL));
+	pointsHidden = true;
+	surface = NULL;
 }
 
 RndPointSet::~RndPointSet(void)
@@ -25,7 +29,7 @@ void RndPointSet::AddPointAttractor( const CRhinoCommandContext& context, double
  
   // Get the surface geometry
   const ON_Surface* ref = go.Object(0).Surface();
-
+  
   if(ref == NULL)
   {
 	RhinoApp().Print(L"reference initialization error");
@@ -76,7 +80,7 @@ void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double
   }
   else
   {
-	CurveAttractor ca(ref, value, surf);
+	CurveAttractor ca(value, surf, go.Object(0));
 	curveAttractors.push_back(ca);
 	context.m_doc.Redraw();
   }
@@ -84,76 +88,320 @@ void RndPointSet::AddCurveAttractor( const CRhinoCommandContext& context, double
 
 void RndPointSet::DeletePointAttractor( const CRhinoCommandContext& context )
 {
-  CRhinoGetPoint getPoint;
+  CRhinoGetObject getPoint;
 
-  //add current attractors as snap points (doesn't help)
-  /*
-  int j;
-  for(j = 0; j < pointAttractors.size(); j++)
-  {
-	  getPoint.AddSnapPoint(pointAttractors.at(j).point);
-  }
-  getPoint.PermitObjectSnap(true);
-  */
+  const ON_Point* ptAttractor;
+  const ON_Curve* curveAttractor;
 
   getPoint.SetCommandPrompt( L"Select attractor to delete" );
-  if(getPoint.GetPoint( ) == CRhinoGet::point) //did it work?
+  getPoint.GetObjects(1,1);
+  if((ptAttractor = getPoint.Object(0).Point()) != NULL) //did it work?
   {
-	  ON_3dPoint attractor = getPoint.Point();
+	  //RhinoApp().Print("got point\n");
 	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
 	  unsigned int j;
 	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
 		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
-		  if(pointAttractors.at(j).point == attractor)
-			  pointAttractors.at(j).pointObj->DeleteFromDocNotification();
+		  if(pointAttractors.at(j).point == ptAttractor->point)
+		  {
+			  context.m_doc.DeleteObject(pointAttractors.at(j).pointObj);
+			  pointAttractors.erase(pointAttractors.begin() + j);
+			  context.m_doc.Redraw();
+			  RhinoApp().Print("Attractor deleted\n");
+			  return;
+		  }
+	  }	  
+  }
+  else if((curveAttractor = getPoint.Object(0).Curve()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got curve\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < curveAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(curveAttractors.at(j).GetCurve() == curveAttractor)
+		  {
+			  context.m_doc.DeleteObject(curveAttractors.at(j).GetObjRef());
+			  curveAttractors.erase(curveAttractors.begin() + j);
+			  context.m_doc.Redraw();
+			  RhinoApp().Print("Attractor deleted\n");
+			  return;
+		  }
 	  }
-	  context.m_doc.Redraw();
+  }
+  else
+  {
+	RhinoApp().Print("No valid attractor in that selection\n");
   }
 }
 
-void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, const ON_Surface* obj)
+void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 {
+  CRhinoGetObject getPoint;
+
+  const ON_Point* ptAttractor;
+  const ON_Curve* curveAttractor;
+
+  getPoint.SetCommandPrompt( L"Select attractor to view and edit" );
+  getPoint.GetObjects(1,1);
+  if((ptAttractor = getPoint.Object(0).Point()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got point\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < pointAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(pointAttractors.at(j).point == ptAttractor->point)
+		  {
+			  RhinoApp().Print("Point #%d: x=%.2f y=%.2f z=%.2f Current strength: %f\n", j, pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z, pointAttractors.at(j).strength);
+
+			  CRhinoGetString getNumber;
+			  double newStrength = NULL;
+
+			  getNumber.SetCommandPrompt( L"Enter new attractor value, or leave blank to keep current value" );
+			  getNumber.AcceptNothing();
+			  if(getNumber.GetString() == CRhinoGetString::nothing)
+			  {
+				RhinoApp().Print("Value unchanged\n");
+				return;
+			  }
+			  newStrength = _wtof(getNumber.String());
+
+			  if(newStrength != NULL)
+			  {
+				pointAttractors.at(j).strength = newStrength;
+				RhinoApp().Print("Strength set to %f\n", pointAttractors.at(j).strength);
+			  }
+			  return;
+		  }
+	  }
+  }
+  else if((curveAttractor = getPoint.Object(0).Curve()) != NULL) //did it work?
+  {
+	  //RhinoApp().Print("got curve\n");
+	  //RhinoApp().Print("pt %f %f %f\n", attractor.x, attractor.y, attractor.z);
+	  unsigned int j;
+	  for(j = 0; j < curveAttractors.size(); j++)
+	  {
+		  //RhinoApp().Print("attr: %f %f %f\n", pointAttractors.at(j).point.x, pointAttractors.at(j).point.y, pointAttractors.at(j).point.z);
+		  if(curveAttractors.at(j).GetCurve() == curveAttractor)
+		  {
+			  RhinoApp().Print("Curve #%d: Current strength: %f\n", j, curveAttractors.at(j).strength);
+
+			  CRhinoGetString getNumber;
+			  double newStrength = NULL;
+
+			  getNumber.SetCommandPrompt( L"Enter new attractor value, or leave blank to keep current value" );
+			  getNumber.AcceptNothing();
+			  if(getNumber.GetString() == CRhinoGetString::nothing)
+			  {
+				RhinoApp().Print("Value unchanged\n");
+				return;
+			  }
+			  newStrength = _wtof(getNumber.String());
+
+			  if(newStrength != NULL)
+			  {
+				curveAttractors.at(j).strength = newStrength;
+				RhinoApp().Print("Strength set to %f\n", curveAttractors.at(j).strength);
+			  }
+			  return;
+		  }
+	  }
+  }
+  else
+  {
+	RhinoApp().Print("No valid attractor in that selection\n");
+  }
+}
+
+void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines)
+{
+	//RhinoApp().Print(L"\n in runvoronoi \n");
+	  const ON_Surface* obj = surface;
+	  ON_Brep* brep = obj->BrepForm();
+	  ON_SimpleArray<const ON_Curve*> curveArr;
 	  float x1,y1,x2,y2;
+	  struct Site *s1;
+	  struct Site *s2;
+	  struct GraphEdge* ge;
 	  ON_3dPoint p1;
 	  ON_3dPoint p2;
 	  VoronoiDiagramGenerator vdg;
-
-	  vdg.generateVoronoi(xValues,yValues,vsize, -1,1,-1,1,.000001); //the user needs to be able to decide these values
-	  vdg.resetIterator();
-	
-	  RhinoApp().Print(L"\n-------------------------------\n");
-	  while(vdg.getNext(x1,y1,x2,y2))
+	  //CellBorder cb;
+	  double umin, umax, vmin, vmax;
+	  obj->GetDomain(0, &umin, &umax);
+	  obj->GetDomain(1, &vmin, &vmax);
+	  //RhinoApp().Print(L"\n start gen \n");
+	  //RhinoApp().Print(L"\n vsize: %d umin: %f umax: %f vmin: %f vmax: %f\n",vsize, umin, umax, vmin, vmax);
+	  if(xValues == NULL || yValues == NULL )
 	  {
-		RhinoApp().Print(L"GOT Line (%f,%f)->(%f,%f)\n",x1,y1,x2, y2);
-		//start drawing edge
-		p1 = obj->PointAt( x1, y1);
-		p2 = obj->PointAt( x2, y2);
-		ON_LineCurve l0 = ON_LineCurve(p1, p2);
-		ON_3dVector v0 = ON_3dVector(0,0,1);
-		ON_SimpleArray<ON_Curve*> arr;
-		ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
+		RhinoApp().Print(L"\n NULL ARRAY \n");
+	  }
+	  /*for(int k=0; k<vsize; k++)
+      {
+		RhinoApp().Print(L"\n u,v : %f,%f \n"),xValues[k],yValues[k];
+	  }*/
 
-		if(arr.First() == NULL)
+	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, (float)0.00001); 
+	  vdg.resetIterator();
+	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
+	  RhinoApp().Print(L"\n start ittr \n");
+	  /*for(int i=0; i<vsize; i++)
+	  {
+		  rndPoints.push_back(ON_SimpleArray<ON_2dPoint>());
+	  }*/
+	  RhinoApp().Print(L"\n-------------------------------\n");
+	 
+	  //while(vdg.getNext(x1,y1,x2,y2,s1,s2))
+	  ON_SimpleArray<ON_2dPoint> pointArr;
+	  ON_2dPoint first;
+	  ON_2dPoint second;
+	  ON_Curve* item;
+	  CRhinoCurveObject* temp;
+	  while((ge = vdg.getNext2()))
+	  {	
+		  x1 = ge->x1;
+		  y1 = ge->y1;
+		  x2 = ge->x2;
+		  y2 = ge->y2;
+		  s1 = ge->reg[0]; //bisected points
+		  s2 = ge->reg[1]; 
+		  RhinoApp().Print(L"here\n");
+		  //RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
+		 
+		//ON_SimpleArray<ON_2dPoint> pointArr;
+		//ON_2dPoint first = ON_2dPoint(x1,y1);
+		//ON_2dPoint second = ON_2dPoint(x2,y2);
+		first = ON_2dPoint(x1,y1);
+		second = ON_2dPoint(x2,y2);
+		//cb = CellBorder(first, second);
+		//RhinoApp().Print(L"HERE");
+		pointArr.Append(first);
+		pointArr.Append(second);		
+		//cellBorderList.push_back(cb);
+		//ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
+		item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
+		//RhinoApp().Print(L"HERE2");
+		if(item != NULL)//draw the cells
 		{
-			v0 = ON_3dVector(0,0,-1);
-			ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
-			if(arr.First() == NULL)
+			//CRhinoCurveObject* temp = context.m_doc.AddCurveObject(*item);
+			temp = context.m_doc.AddCurveObject(*item);
+			cellLines.push_back(temp);
+			if(!drawCellLines)
+				context.m_doc.HideObject(temp);
+		}
+		context.m_doc.Redraw();
+		//RhinoApp().Print(L"HERE3");
+		//first = NULL;
+		//second = NULL;
+		pointArr.Destroy();
+		//RhinoApp().Print(L"HERE4\n");
+		//search for closest points
+		/* 
+		ON_2dPoint midpoint = ON_2dPoint( (x1 + x2) / 2, (y1+ y2) / 2 );
+		//ON_2dPoint side1, side2;
+		double dist1 = DBL_MAX, dist2 = DBL_MAX, currdist;
+		int point1 =0, point2 =0;
+		//RhinoApp().Print(L"HERE2");
+		
+		for(int i=0; i<vsize; i++)
+		{
+			
+			currdist = sqrt(pow((xValues[i] - midpoint.x), 2) + pow((yValues[i] - midpoint.y), 2));
+			if(currdist < dist1)
 			{
-				RhinoApp().Print(L"no projection"); //ideally this should never actually print I believe this is the cause of the gaps
+				point2 = point1;
+				dist2 = dist1;
+				dist1 = currdist;
+				point1 = i;
+			}else if(currdist < dist2)
+			{
+				point2 = i;
+				dist2 = currdist;
+			}else
+			{
+
 			}
 		}
-		else
-		{
-			context.m_doc.AddCurveObject(**arr.First());
-		}
+		ON_2dPoint offsetPoint = ON_2dPoint( (midpoint.x + xValues[point1])/2, (midpoint.y + yValues[point1])/2);
+		rndPoints.at(point1).Append(offsetPoint);
+		offsetPoint = ON_2dPoint( (midpoint.x + xValues[point2])/2, (midpoint.y + yValues[point2])/2);
+		rndPoints.at(point2).Append(offsetPoint);
+		*/
 	  }
-	  //context.m_doc.Redraw();
+	  RhinoApp().Print(L"end while");
+	  //RhinoApp().Print(L"HERE2");
+	  
+	  //draw trim curves
+	 /* for(int i=0; i<vsize; i++)
+      {
+			currentCenter = i;
+			rndPoints.at(i).QuickSort(&sortPoints);
+			//rndPoints.at(i).QuickSort(ON_CompareIncreasing);
+			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .01, 0);
+			//trimming code
+			/*
+			ON_BrepLoop& loop = brep->NewLoop( ON_BrepLoop::inner );
+			
+			int c2i, ei=0, bRev3d=0;
+			ON_Surface::ISO iso = ON_Surface::not_iso;
+			c2i = brep->m_C2.Count();
+			brep->m_C2.Append(item);
+			ON_BrepTrim& trim = brep->NewTrim( brep->m_E[ei], bRev3d, loop, c2i );
+			*/
+				
+		/*	
+			if(item != NULL)
+			{
+				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
+				
+				curveArr.Append(item);
+			}else
+			{
+				//RhinoApp().Print(L"no projection");
+			}
+	  }
+	  //RhinoApp().Print(L"HERE3");
+	  
+	  ON_Brep* split = RhinoSplitBrepFace(*mainBrep, 0 , curveArr, .01, true);
+	  if (split==NULL)
+	  {
+		  RhinoApp().Print(L"split failed");
+	  }else
+	  {
+		  RhinoApp().Print(L"split worked");
+		  context.m_doc.AddBrepObject(*split);
+	  }
+*/
 	  delete(xValues);
 	  delete(yValues);
+	  context.m_doc.Redraw();
 }
+int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
+{
+	if (p1->x >= 0 && p2->x < 0)
+        return 1;
+    if (p1->x == 0 && p2->x == 0)
+        return p1->y > p2->y;
 
-void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double maxExponent )
+    // compute the cross product of vectors (center -> a) x (center -> b)
+    float det = (p1->x-xValues[currentCenter]) * (p2->y - yValues[currentCenter]) - (p2->x - xValues[currentCenter]) * (p1->y - yValues[currentCenter]);
+    if (det < 0)
+        return 1;
+    if (det > 0)
+        return -1;
+
+    // points a and b are on the same line from the center
+    // check which point is closer to the center
+    int d1 = (p1->x-xValues[currentCenter]) * (p1->x-xValues[currentCenter]) + (p1->y-yValues[currentCenter]) * (p1->y-yValues[currentCenter]);
+    int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
+    return d1 > d2;
+}
+void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength )
 {
   // Pick a surface to evaluate
   CRhinoGetObject go;
@@ -161,76 +409,75 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
   go.SetGeometryFilter( CRhinoGetObject::surface_object);
   go.GetObjects( 1, 1 );
   vsize = numPoints;
+
   // Get the surface geometry
   const CRhinoObjRef& ref = go.Object(0);
-
   if(ref == NULL)
   {
 	RhinoApp().Print(L"reference initialization error");
 	return ;
   }
-
   const ON_Surface* obj = ref.Surface();
-
   if(obj == NULL)
   {
 	RhinoApp().Print(L"object initialization error");
 	return ;
-  }
-	
-  double u1, u2, v1, v2, minStrength;
-  minStrength = NULL;
-
-
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-  RhinoApp().Print("\nErase check");
+  }	
+  mainBrep = ref.Brep();
+  surface = obj;
+  
+  //Erase check and check if the surfaces match
   if(pointAttractors.size() > 0)
   {
 	  //removed deleted attractors
 	  unsigned int j;
-	  for(j = 1; j < pointAttractors.size(); j++)
+	  for(j = 0; j < pointAttractors.size(); j++)
 	  {
-		  if(pointAttractors.at(j).pointObj->IsDeleted())
+		  if(&(pointAttractors.at(j).pointObj->Point()) == NULL || !pointAttractors.at(j).CheckSurface(surface))
 		  {
-			  RhinoApp().Print("\nErasing deleted attractor");
+			  RhinoApp().Print("\nErasing bad point attractor");
 			  pointAttractors.erase(pointAttractors.begin() + j);
 		  }
 	  }
   }
-  //--------------------------------------------THIS CODE DOESN'T REALLY DO ANYTHING RIGHT NOW
-
-  if(pointAttractors.size() > 0)
-  {
-	  //find the attractor with the least strength (magnitude)
-	  unsigned int j;
-	  minStrength = abs(pointAttractors.at(0).strength);
-	  for(j = 1; j < pointAttractors.size(); j++)
-	  {
-		  if(abs(pointAttractors.at(j).strength) < minStrength)
-			  minStrength = abs(pointAttractors.at(j).strength);
-	  }
-  }
-  RhinoApp().Print("\nStarting curve min");
   if(curveAttractors.size() > 0)
   {
-	  //find the attractor with the least strength (magnitude)
+	  //removed deleted attractors
 	  unsigned int j;
-	  if(minStrength == NULL)
-	  {
-		RhinoApp().Print("\nNo point attractors - min str was null");
-		minStrength = abs(curveAttractors.at(0).strength);
-	  }
 	  for(j = 0; j < curveAttractors.size(); j++)
 	  {
-		  RhinoApp().Print("\nFinding curve min");
-		  if(abs(curveAttractors.at(j).strength) < minStrength)
-			  minStrength = abs(curveAttractors.at(j).strength);
+		  if(curveAttractors.at(j).GetObjRef().Curve() == NULL || !curveAttractors.at(j).CheckSurface(surface))
+		  {
+			  RhinoApp().Print("\nErasing deleted curve attractor");
+			  curveAttractors.erase(curveAttractors.begin() + j);
+		  }
 	  }
   }
+    
+  if(EvaluateAttractorsManyVectors(context, numPoints, overallStrength))
+  {
+	  unsigned int i;
+	  for(i = 0; i < pointAttractors.size(); i++)
+	  {
+		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
+	  }
+	  for(i = 0; i < curveAttractors.size(); i++)
+	  {
+		  context.m_doc.DeleteObject(curveAttractors.at(i).GetObjRef());
+	  }
+	  context.m_doc.Redraw();
+	  pointsHidden = false;
+  }
+  else
+  {
+	RhinoApp().Print(L"object domain error");
+  }
+}
 
-  RhinoApp().Print("\nMin Strength Attractor: %f", minStrength);
-
-  if(obj->GetDomain(0, &u1, &u2) && obj->GetDomain(1, &v1, &v2))
+bool RndPointSet::EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength)
+{
+  double u1, u2, v1, v2;
+  if(surface->GetDomain(0, &u1, &u2) && surface->GetDomain(1, &v1, &v2))
   {
 	  xValues = new float[numPoints];
 	  yValues = new float[numPoints];
@@ -238,174 +485,206 @@ void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int 
 	  ON_3dPoint prev;
 	  for(i = 0; i < numPoints; i++)
 	  {
-		  bool redo = true; //used to redo due to attractors
 		  ON_3dPoint p0;
-		  while(redo)
+		  double u, v = 0.0;
+		  p0 = surface->PointAt( u = fRand(u1, u2), v = fRand(v1, v2));
+		  //RhinoApp().Print(L"p0.x = %f ",p0.x);
+		  //RhinoApp().Print(L"p0.y = %f ",p0.y);
+		  //RhinoApp().Print(L"p0.z = %f ",p0.z);
+		  //RhinoApp().Print(L"p0.u = %f ",u);
+		  //RhinoApp().Print(L"p0.v = %f ",v);
+
+		  //RhinoApp().Print(L" adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
+		  //RhinoApp().Print(L"p0.u = %f\n",u);
+		  //RhinoApp().Print(L"p0.v = %f\n",v);
+
+		  //deal with attractors
+		  
+		  if(pointAttractors.size() + curveAttractors.size() > 0)
 		  {
-			  double u, v = 0.0;
-			  p0 = obj->PointAt( u = fRand(u1, u2), v = fRand(v1, v2));
-			  //context.m_doc.AddPointObject(p0); 
-			  //RhinoApp().Print(L"p0.x = %f ",p0.x);
-			  //RhinoApp().Print(L"p0.y = %f ",p0.y);
-			  //RhinoApp().Print(L"p0.z = %f ",p0.z);
-			  //RhinoApp().Print(L"p0.u = %f ",u);
-			  //RhinoApp().Print(L"p0.v = %f ",v);
+			  
+			  double uChange = 0;
+			  double vChange = 0;
 
-			  xValues[i] = (float)(u);
-			  yValues[i] = (float)(v);
-			  RhinoApp().Print(L" \n adding: %f,%f aka %f %f %f\n",(float)u,(float)v, p0.x, p0.y, p0.z);
-			  //RhinoApp().Print(L"p0.u = %f\n",u);
-			  //RhinoApp().Print(L"p0.v = %f\n",v);
-			  //code to make lines between points
-			  /*if(i>0)
+			  unsigned int j;
+			  for(j = 0; j < pointAttractors.size(); j++)
 			  {
-				  ON_LineCurve l0 = ON_LineCurve(p1, prev);
-				  ON_3dVector v0 = ON_3dVector(0,0,1);
-				  ON_SimpleArray<ON_Curve*> arr;
-				  ProjectCurveToBrep(*obj->BrepForm(), l0, v0, 1.0, arr);
-				  if(arr.First() == NULL)
-				  {
-					RhinoApp().Print(L"no projection");
-				  }else
-				  {
-					context.m_doc.AddCurveObject(**arr.First());
-				  }
-				  
+				  pointAttractors.at(j).Shift(u, v, &uChange, &vChange, overallStrength);
 			  }
-			  prev = p1;*/
-
-			  //deal with attractors
-			  if(pointAttractors.size() + curveAttractors.size() > 0)
+			  for(j = 0; j < curveAttractors.size(); j++)
 			  {
-				  double totalScore = 0.0;
-				  double totalMultOfMinStrength = 0.0;
-				  unsigned int j;
-				  for(j = 0; j < pointAttractors.size(); j++)
-				  {
-					  double score = pointAttractors.at(j).GetScore(u,v);
-					  //How many times stronger than the weakest is this attractor?
-					  double minStrengthMult = abs(pointAttractors.at(j).strength)/minStrength;
-					  RhinoApp().Print("\nPoint %f %f Point Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
-					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
-					  totalMultOfMinStrength += minStrengthMult;
-				  }
-				  for(j = 0; j < curveAttractors.size(); j++)
-				  {
-					  double score = curveAttractors.at(j).GetScore(u,v, p0);
-					  //How many times stronger than the weakest is this attractor?
-					  double minStrengthMult = abs(curveAttractors.at(j).strength)/minStrength;
-					  RhinoApp().Print("\nPoint %f %f Curve Attractor %d Score %f Mult %f", u, v, j, score, minStrengthMult);
-					  totalScore += score * minStrengthMult; //we want to give stronger attractors a bigger "vote"
-					  totalMultOfMinStrength += minStrengthMult;
-				  }
-
-				  //double smallExponent = (totalScore/totalMultOfMinStrength)*maxExponent;
-				  //double stayChance = (exp(smallExponent)/exp(maxExponent));
-				  double stayChance = (totalScore/totalMultOfMinStrength);
-				  //double rolled = fRand(0, 1);
-
-				  double rolled = 1/exp((1-fRand(0, 1))*maxExponent);
-				  RhinoApp().Print("\nChance to stay: %f Rolled: %f", stayChance, rolled);
-				  if(rolled > stayChance)
-				  {
-					  RhinoApp().Print("\nRepicking point");
-				  }
-				  else
-				  {
-					  RhinoApp().Print("\nPoint accepted");
-					  redo = false;
-				  }
+				  PointAttractor pa;
+				  curveAttractors.at(j).GetClosestPointAttractor(p0, &pa);
+				  if(&pa != NULL)
+					  pa.Shift(u, v, &uChange, &vChange, overallStrength);
 			  }
-			  else
-			  {
-				  redo = false;
-			  }
+			  u += uChange;
+			  v += vChange;
+
+			  //make sure the values aren't out of bounds
+			  if(u < u1) u = u1;
+			  else if(u > u2) u = u2;
+			  if(v < v1) v = v1;
+			  else if(v > v2) v = v2;
 		  }
-		  context.m_doc.AddPointObject(p0);
-	  }
-	  RunVoronoi(context, obj);
-	  for(i = 0; i < pointAttractors.size(); i++)
-	  {
-		  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
-	  }
+		  //add this point to the data set
+		  xValues[i] = (float)(u);
+		  yValues[i] = (float)(v);
+		  p0 = surface->PointAt(u, v);
 
-	  context.m_doc.Redraw();	  
+		  points.push_back(context.m_doc.AddPointObject(p0));
+	  }
+	  return true;
   }
   else
   {
-	RhinoApp().Print(L"object domain error");
-	return ;
+	return false;
   }
-
 }
 
-void RndPointSet::Test( const CRhinoCommandContext& context, double a, double b, double c, double d )
+void RndPointSet::ToggleHidePoints(const CRhinoCommandContext& context, bool drawCellLines)
 {
-  // Pick a surface to evaluate
-  CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select surface to evaluate - test function" );
-  go.SetGeometryFilter( CRhinoGetObject::surface_object);
-  go.GetObjects( 1, 1 );
+	unsigned int i;
+	if(pointsHidden)
+	{
+	  pointsHidden = false;
+	  RhinoApp().Print(L"Points/lines displayed\n");
+	  for(i = 0; i < points.size(); i++)
+	  {
+		  context.m_doc.ShowObject(points.at(i));
 
- 
-  // Get the surface geometry
-  const CRhinoObjRef& ref = go.Object(0);
-  const ON_Surface* obj = ref.Surface();
-
-  ON_3dPoint p0 = obj->PointAt( a, b);
-  double u, v;
-  obj->GetClosestPoint(p0, &u, &v);
-  ON_3dPoint p1 = obj->PointAt( u, v);
-
-  context.m_doc.AddPointObject(p1);
-  context.m_doc.Redraw();
+	  }
+	  if(drawCellLines)
+	  {
+		  for(i = 0; i<cellLines.size(); i++)
+		  {
+			  context.m_doc.ShowObject(cellLines.at(i));
+		  }
+	  }
+	}
+	else
+	{
+	  pointsHidden = true;
+	  RhinoApp().Print(L"Points/lines hidden\n");
+	  for(i = 0; i < points.size(); i++)
+	  {
+		  context.m_doc.HideObject(points.at(i));
+	  }
+	  for(i = 0; i<cellLines.size(); i++)
+	  {
+		  context.m_doc.HideObject(cellLines.at(i));
+	  }
+	}
+	context.m_doc.Redraw();
 }
+
+void RndPointSet::BurnData(const CRhinoCommandContext& context)
+{
+	rndPoints.clear();
+	cellBorderList.clear();
+	pointAttractors.clear();
+	curveAttractors.clear();
+	points.clear();
+	cellLines.clear();
+	surfaceCurves.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nData burned");
+}
+
+void RndPointSet::ClearAll(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < pointAttractors.size(); i++)
+	{
+	  context.m_doc.DeleteObject(pointAttractors.at(i).pointObj);
+	}
+	for(i = 0; i < curveAttractors.size(); i++)
+	{
+	  context.m_doc.DeleteObject(curveAttractors.at(i).GetObjRef());
+	}
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.DeleteObject(points.at(i));
+	}
+	for(i = 0; i < cellLines.size(); i++)
+	{
+	  context.m_doc.DeleteObject(cellLines.at(i));
+	}
+	for(i = 0; i < surfaceCurves.size(); i++)
+	{
+	  context.m_doc.DeleteObject(surfaceCurves.at(i));
+	}
+
+	rndPoints.clear();
+	cellBorderList.clear();
+	pointAttractors.clear();
+	curveAttractors.clear();
+	points.clear();
+	cellLines.clear();
+	surfaceCurves.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nData cleared");
+}
+
+void RndPointSet::UndoCurves(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.ShowObject(points.at(i));
+	}
+	for(i = 0; i < cellLines.size(); i++)
+	{
+	  context.m_doc.DeleteObject(cellLines.at(i));
+	}
+	for(i = 0; i < surfaceCurves.size(); i++)
+	{
+	  context.m_doc.DeleteObject(surfaceCurves.at(i));
+	}
+
+	cellBorderList.clear();
+	cellLines.clear();
+	surfaceCurves.clear();
+	rndPoints.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nCurves cleared");
+}
+
+void RndPointSet::UndoPoints(const CRhinoCommandContext& context)
+{
+	unsigned int i;
+
+	for(i = 0; i < pointAttractors.size(); i++)
+	{
+	  pointAttractors.at(i).pointObj = context.m_doc.AddPointObject(pointAttractors.at(i).point);
+	}
+	for(i = 0; i < curveAttractors.size(); i++)
+	{
+	  curveAttractors.at(i).SetObjRef(context.m_doc.AddCurveObject(*(curveAttractors.at(i).GetCurve())));
+	}
+	for(i = 0; i < points.size(); i++)
+	{
+	  context.m_doc.DeleteObject(points.at(i));
+	}
+
+	points.clear();
+
+	context.m_doc.Redraw();
+
+	RhinoApp().Print("\nPoints cleared");
+}
+
 
 double RndPointSet::fRand(double fMin, double fMax)
 {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
-}
-
-/*
-Description:
-  Projects a curve onto a surface or polysurface
-Parameters:
-  brep  - [in] The brep to project the curve onto.
-  curve - [in] The curve to project.
-  dir   - [in] The direction of the projection.
-  tol   - [in] The intersection tolerance.
-  output_curves - [out] The output curves. 
-                        NOTE, the caller is responsible 
-                        for destroying these curves.
-Returns:
-  true if successful.
-  false if unsuccessful.
-*/
-bool RndPointSet::ProjectCurveToBrep(
-        const ON_Brep& brep, 
-        const ON_Curve& curve, 
-        const ON_3dVector& dir, 
-        double tolerance,
-        ON_SimpleArray<ON_Curve*>& output_curves
-        )
-{
-  ON_3dVector n = dir;
-  if( !n.Unitize() ) 
-    return false;
- 
-  ON_BoundingBox bbox = brep.BoundingBox();
-  bbox.Union( curve.BoundingBox() );
- 
-  ON_Surface* pExtrusion = RhinoExtrudeCurveStraight( &curve, dir, bbox.Diagonal().Length() );
-  if( 0 == pExtrusion )
-    return false;
- 
-  ON_Brep* pBrep = ON_Brep::New();
-  pBrep->Create( pExtrusion );
- 
-  BOOL rc = RhinoIntersectBreps( *pBrep, brep, tolerance, output_curves );
-  delete pBrep; // Don't leak...
- 
-  return ( rc ) ? true : false;
 }
