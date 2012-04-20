@@ -223,7 +223,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
-	  ON_SimpleArray<const ON_Curve*> curveArr;
+	  
 	  float x1,y1,x2,y2;
 	  struct Site *s1;
 	  struct Site *s2;
@@ -270,8 +270,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		  y2 = ge->y2;
 		  s1 = ge->reg[0]; //bisected points
 		  s2 = ge->reg[1]; 
-		  RhinoApp().Print(L"here\n");
-		  //RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y);
+		  //RhinoApp().Print(L"here\n");
+		  RhinoApp().Print(L"Number %d and %d:: %f,%f \t||\t %f,%f \t || \t %d, %d\n",s1->sitenbr, s2->sitenbr,s1->coord.x,s1->coord.y,s2->coord.x,s2->coord.y, s1->sitenbr, s2->sitenbr);
 		 
 		//ON_SimpleArray<ON_2dPoint> pointArr;
 		//ON_2dPoint first = ON_2dPoint(x1,y1);
@@ -367,19 +367,29 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  }
 	  //RhinoApp().Print(L"HERE3");
 	  
-	  ON_Brep* split = RhinoSplitBrepFace(*mainBrep, 0 , curveArr, .01, true);
-	  if (split==NULL)
-	  {
-		  RhinoApp().Print(L"split failed");
-	  }else
-	  {
-		  RhinoApp().Print(L"split worked");
-		  context.m_doc.AddBrepObject(*split);
-	  }
 */
 	  //delete(xValues);
 	  //delete(yValues);
 	  context.m_doc.Redraw();
+}
+void RndPointSet::TrimBrep( const CRhinoCommandContext& context )
+{
+	CRhinoGetObject go;
+	go.SetCommandPrompt( L"Select surface to trim" );
+	go.SetGeometryFilter( CRhinoGetObject::surface_object);
+	go.GetObjects( 1, 1 );
+
+	// Get the surface geometry
+	const ON_Brep* ref = go.Object(0).Brep();
+	ON_Brep* split = RhinoSplitBrepFace(*ref, 0 , curveArr, .01, true);
+	if (split==NULL)
+	{
+	  RhinoApp().Print(L"split failed");
+	}else
+	{
+	  RhinoApp().Print(L"split worked");
+	  context.m_doc.AddBrepObject(*split);
+	}
 }
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 {

@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_BURN, &CVoronoiDialog::OnBnClickedBurn)
 	ON_BN_CLICKED(IDC_HELP, &CVoronoiDialog::OnBnClickedHelp)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_INDVSTRENGTH_SLIDER, &CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider)
+	ON_BN_CLICKED(IDC_TRIM, &CVoronoiDialog::OnBnClickedTrim)
 END_MESSAGE_MAP()
 
 
@@ -270,4 +271,10 @@ void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESUL
 	CString num;
 	num.Format(_T("%d"), pos);
 	attractor_StrengthEdit.SetWindowTextW(num);
+}
+
+void CVoronoiDialog::OnBnClickedTrim()
+{
+	ON_wString cmd = L"! _TrimBrep ";
+	RhinoApp().RunScript( cmd , 0 );
 }
