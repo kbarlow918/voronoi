@@ -284,4 +284,5 @@ void CVoronoiDialog::OnBnClickedTrim()
 {
 	ON_wString cmd = L"! _TrimBrep ";
 	RhinoApp().RunScript( cmd , 0 );
+	SetState(DONE);
 }
