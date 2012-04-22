@@ -5,7 +5,7 @@
 float *xValues;
 float *yValues;
 int vsize = 0;
-int currentCenter = 0;
+float avgU, avgV; //used to calculate center to sort points for trim curves
 std::vector<ON_SimpleArray<ON_2dPoint>> rndPoints;
 RndPointSet::RndPointSet(void)
 {
@@ -271,7 +271,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			edgeList.push_back(ge);
 		  }
 	  }
-	  RhinoApp().Print(L"Edges: %d\n", edgeList.size());
+	  //RhinoApp().Print(L"Edges: %d\n", edgeList.size());
 	  vdg.resetIterator();
 	  while((ge = vdg.getNext2()))
 	  {	
@@ -287,27 +287,22 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 		 
 			first = ON_2dPoint(x1, y1);
 			second = ON_2dPoint(x2, y2);
-			//create a cached dictionary mapping site # to point
-			//otherwise search
+			//draw line
 
 			pointArr.Append(first);
 			pointArr.Append(second);		
 
 			item = RhinoInterpolatePointsOnSurface(*obj, pointArr, 0, .01, 0);
-			//RhinoApp().Print(L"HERE2");
 			if(item != NULL)//draw the cells
 			{
-			//CRhinoCurveObject* temp = context.m_doc.AddCurveObject(*item);
-				if(s1 != NULL && s2 != NULL)
-				{
-					temp = context.m_doc.AddCurveObject(*item);
-					cellLines.push_back(temp);
+			   temp = context.m_doc.AddCurveObject(*item);
+			   cellLines.push_back(temp);
 					if(!drawCellLines)
 						context.m_doc.HideObject(temp);
-				}
-
 			}
 			pointArr.Destroy();
+
+			//find the site that the edge relates to, if it can be drawn
 		  if(s1 != NULL && s2 != NULL && item != NULL)
 		  {
 			  
@@ -352,8 +347,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				}
 
 				//RhinoApp().Print(L"S2:%d\n", s2->sitenbr);
-			  u = s2->coord.x;
-			 v = s2->coord.y;
+			   u = s2->coord.x;
+			   v = s2->coord.y;
 				index = -1;
 				//search for matching random point
 				for(int i=0; i<vsize; i++)
@@ -390,47 +385,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					rndPoints.at(index).Append(offsetPoint);*/
 				}
 		  }
-		  /*if(s2 != NULL)
-		  {
-			  //RhinoApp().Print(L"S2:%d\n", s2->sitenbr);
-			  float u = s2->coord.x;
-				float v = s2->coord.y;
-				int index = -1;
-				//search for matching random point
-				for(int i=0; i<vsize; i++)
-				{
-					if(xValues[i] == u && yValues[i] == v)
-					{
-						//found match
-						index = i;
-						break;
-					}
-				}
-				if(index == -1)
-				{
-					//no match found
-					RhinoApp().Print(L"No matching point");
-				}else
-				{
-					ON_2dPoint offsetPoint;// = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
-					//move endpoints along vector towards center point
-					float midx = x1/2 + x2/2;
-					float midy = y1/2 + y2/2;
-					float dist = sqrt(pow((xValues[index] - midx), 2) + pow((yValues[index] - midy), 2));
-					float xvec = (xValues[index] - midx)/dist;
-					float yvec = (yValues[index] - midy)/dist;
-					offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
-					rndPoints.at(index).Append(offsetPoint);
-					ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
-						points.push_back(context.m_doc.AddPointObject(p0));
-					/*dist = sqrt(pow((xValues[index] - x2), 2) + pow((yValues[index] - y2), 2));
-					xvec = (xValues[index] - x2) /dist;
-					yvec = (yValues[index] - y2) /dist;
-					offsetPoint = ON_2dPoint( x2 + xvec * offset, y2 + yvec* offset);
-					rndPoints.at(index).Append(offsetPoint);
-				}
-		  }*/
-			
+		  //border edge
 		  if(s1 == NULL && s2 == NULL)
 		  {
 			  //RhinoApp().Print(L"here border\n");
@@ -532,10 +487,10 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					if(index == -1)
 					{
 						//no match found
-						RhinoApp().Print(L"No matching point");
+						//RhinoApp().Print(L"No matching point");
 					}else
 					{
-						RhinoApp().Print(L"placing border point\n");
+						//RhinoApp().Print(L"placing border point\n");
 						ON_2dPoint offsetPoint;// = ON_2dPoint( x1/2 + x2/2, y1/2 + y2/2);
 						//move endpoints along vector towards center point
 						float midx = x1/2 + x2/2;
@@ -544,7 +499,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 						float xvec = (xValues[index] - midx)/dist;
 						float yvec = (yValues[index] - midy)/dist;
 						offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
-						//rndPoints.at(index).Append(offsetPoint);
+						rndPoints.at(index).Append(offsetPoint);
 						ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
 						points.push_back(context.m_doc.AddPointObject(p0));
 						
@@ -552,30 +507,31 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			  }
 		  }
 		  
-		
-		//cb = CellBorder(first, second);
-		//RhinoApp().Print(L"HERE");
-		
-		
 	  }
-	  RhinoApp().Print(L"end while");
-	  RhinoApp().Print(L"PointCount: %d", pointCount);
+	  //RhinoApp().Print(L"end while");
+	  //RhinoApp().Print(L"PointCount: %d", pointCount);
 	  //RhinoApp().Print(L"HERE2");
 	  
 	  //draw trim curves
 	  for(int i=0; i<vsize; i++)
       {
-			currentCenter = i;
+			avgU = 0;
+			avgV = 0;
+			//find the center of the points
+			for(int j=0; j < rndPoints.at(i).Count(); j++)
+			{
+				avgU += rndPoints.at(i).At(j)->x;
+				avgV += rndPoints.at(i).At(j)->y;
+			}
+			avgU = avgU / rndPoints.at(i).Count();
+			avgV = avgV / rndPoints.at(i).Count();
 			rndPoints.at(i).QuickSort(&sortPoints);
 			//rndPoints.at(i).QuickSort(ON_CompareIncreasing);
-			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .01, 0);
+			ON_Curve* item = RhinoInterpolatePointsOnSurface(*obj, rndPoints.at(i), 1, .001, 0);
 			//trimming code
-				
-		
 			if(item != NULL)
 			{
 				surfaceCurves.push_back(context.m_doc.AddCurveObject(*item));
-				
 				curveArr.Append(item);
 			}else
 			{
@@ -598,25 +554,33 @@ void RndPointSet::TrimBrep( const CRhinoCommandContext& context )
 
 	// Get the surface geometry
 	const ON_Brep* ref = go.Object(0).Brep();
-	ON_Brep* split = RhinoSplitBrepFace(*ref, 0 , curveArr, .01, true);
-	if (split==NULL)
+	//ref->CullUnusedFaces();
+	for(int i=0; i < ref->m_F.SizeOf(); i++)
 	{
-	  RhinoApp().Print(L"split failed");
-	}else
-	{
-	  RhinoApp().Print(L"split worked");
-	  context.m_doc.AddBrepObject(*split);
+		
+		ON_Brep* split = RhinoSplitBrepFace(*ref, i , curveArr, .001, true);
+		if (split==NULL)
+		{
+		  //RhinoApp().Print(L"split failed");
+		}else
+		{
+		  RhinoApp().Print(L"split worked");
+		  context.m_doc.AddBrepObject(*split);
+		}
+		
+		
 	}
+	
 }
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 {
 	if (p1->x >= 0 && p2->x < 0)
-        return -1;
+        return 1;
     if (p1->x == 0 && p2->x == 0)
         return p1->y > p2->y;
 
     // compute the cross product of vectors (center -> a) x (center -> b)
-    float det = (p1->x-xValues[currentCenter]) * (p2->y - yValues[currentCenter]) - (p2->x - xValues[currentCenter]) * (p1->y - yValues[currentCenter]);
+    float det = (p1->x-avgU) * (p2->y - avgV) - (p2->x - avgU) * (p1->y - avgV);
     if (det < 0)
         return 1;
     if (det > 0)
@@ -624,8 +588,8 @@ int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 
     // points a and b are on the same line from the center
     // check which point is closer to the center
-    int d1 = (p1->x-xValues[currentCenter]) * (p1->x-xValues[currentCenter]) + (p1->y-yValues[currentCenter]) * (p1->y-yValues[currentCenter]);
-    int d2 = (p2->x-xValues[currentCenter]) * (p2->x-xValues[currentCenter]) + (p2->y-yValues[currentCenter]) * (p2->y-yValues[currentCenter]);
+    int d1 = (p1->x-avgU) * (p1->x-avgU) + (p1->y-avgV) * (p1->y-avgV);
+    int d2 = (p2->x-avgU) * (p2->x-avgU) + (p2->y-avgV) * (p2->y-avgV);
     return d1 > d2;
 }
 void RndPointSet::DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength )
@@ -879,7 +843,7 @@ void RndPointSet::UndoCurves(const CRhinoCommandContext& context)
 	cellLines.clear();
 	surfaceCurves.clear();
 	rndPoints.clear();
-
+	curveArr.Destroy();
 	context.m_doc.Redraw();
 
 	RhinoApp().Print("\nCurves cleared");
