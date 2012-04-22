@@ -337,8 +337,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 					rndPoints.at(index).Append(offsetPoint);
 					pointCount++;
-					ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
-						points.push_back(context.m_doc.AddPointObject(p0));
+					//ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
+					//points.push_back(context.m_doc.AddPointObject(p0));
 					/*dist = sqrt(pow((xValues[index] - x2), 2) + pow((yValues[index] - y2), 2));
 					xvec = (xValues[index] - x2) /dist;
 					yvec = (yValues[index] - y2) /dist;
@@ -376,8 +376,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 					offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 					rndPoints.at(index).Append(offsetPoint);
 					pointCount++;
-					ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
-						points.push_back(context.m_doc.AddPointObject(p0));
+					//ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
+					//points.push_back(context.m_doc.AddPointObject(p0));
 					/*dist = sqrt(pow((xValues[index] - x2), 2) + pow((yValues[index] - y2), 2));
 					xvec = (xValues[index] - x2) /dist;
 					yvec = (yValues[index] - y2) /dist;
@@ -500,8 +500,8 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 						float yvec = (yValues[index] - midy)/dist;
 						offsetPoint = ON_2dPoint( midx + xvec * offset, midy + yvec * offset);
 						rndPoints.at(index).Append(offsetPoint);
-						ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
-						points.push_back(context.m_doc.AddPointObject(p0));
+						//ON_3dPoint p0 = surface->PointAt( offsetPoint.x, offsetPoint.y);
+						//points.push_back(context.m_doc.AddPointObject(p0));
 						
 					}
 			  }
