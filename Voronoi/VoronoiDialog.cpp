@@ -52,8 +52,8 @@ void CVoronoiDialog::DoDataExchange(CDataExchange* pDX)
 	//default values
 	attractor_StrengthEdit.SetWindowTextW(L"70");
 	points_NumPointEdit.SetWindowTextW(L"50");
-	voronoi_InnerCurveOffsetEdit.SetWindowTextW(L"0.5");
-	voronoi_MinDistEdit.SetWindowTextW(L"0.01");
+	voronoi_InnerCurveOffsetEdit.SetWindowTextW(L"0.05");
+	voronoi_MinDistEdit.SetWindowTextW(L"0.001");
 
 	points_strength_slider.SetRangeMin(0);
 	points_strength_slider.SetRangeMax(100, true);
