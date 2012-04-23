@@ -281,6 +281,16 @@ void CVoronoiDialog::OnBnClickedBurn()
 	OnOK();
 }
 
+<<<<<<< HEAD
+void CVoronoiDialog::OnBnClickedHelp()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	ON_wString cmd = L"! _HelpDlg ";
+	RhinoApp().RunScript( cmd , 0 );
+}
+=======
+>>>>>>> 7343f85010dc015ef5c3fbe18c57b82fb6296b4a
+
 void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

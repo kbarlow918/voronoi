@@ -7,6 +7,7 @@ float *yValues;
 int vsize = 0;
 float avgU, avgV; //used to calculate center to sort points for trim curves
 std::vector<ON_SimpleArray<ON_2dPoint>> rndPoints;
+
 RndPointSet::RndPointSet(void)
 {
 	srand((unsigned int)time(NULL));
@@ -221,7 +222,7 @@ void RndPointSet::ViewEdit( const CRhinoCommandContext& context )
 
 void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellLines, float minDist, float offset)
 {
-	  //AFX_MANAGE_STATE( AfxGetStaticModuleState() );
+	  AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 	//RhinoApp().Print(L"\n in runvoronoi \n");
 	  const ON_Surface* obj = surface;
 	  ON_Brep* brep = obj->BrepForm();
@@ -250,6 +251,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 
 	  vdg.generateVoronoi(xValues,yValues,vsize, (float)umin, (float)umax, (float)vmin, (float)vmax, minDist); 
 	  vdg.resetIterator();
+	  rndPoints.clear();
 	  //rndPoints = new ON_SimpleArray<ON_2dPoint>[vsize];
 	  RhinoApp().Print(L"\n start ittr \n");
 	  for(int i=0; i<vsize; i++)
@@ -274,6 +276,9 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 	  }
 	  //RhinoApp().Print(L"Edges: %d\n", edgeList.size());
 	  vdg.resetIterator();
+	  struct GraphEdge* ge1 = NULL;
+	  struct GraphEdge* ge2 = NULL;
+	  struct GraphEdge* cur = NULL;
 	  while((ge = vdg.getNext2()))
 	  {	
 		  x1 = ge->x1;
@@ -304,7 +309,7 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 			pointArr.Destroy();
 
 			//find the site that the edge relates to, if it can be drawn
-		  if(s1 != NULL && s2 != NULL && item != NULL)
+		  if(s1 != (struct Site *)NULL && s2 != (struct Site *)NULL && item != (ON_Curve *)NULL)
 		  {
 			  
 			  //RhinoApp().Print(L"S1:%d\n", s1->sitenbr);
@@ -387,15 +392,16 @@ void RndPointSet::RunVoronoi(const CRhinoCommandContext& context, bool drawCellL
 				}
 		  }
 		  //border edge
-		  if(s1 == NULL && s2 == NULL)
+		  if((struct Site *)s1 == NULL && (struct Site *)s2 == NULL)
 		  {
 			  //RhinoApp().Print(L"here border\n");
 			//search edgelist for matching endpoints
-			  struct GraphEdge* ge1 = NULL;
-			  struct GraphEdge* ge2 = NULL;
-			  struct GraphEdge* cur = NULL;
+			  ge1 = NULL;
+			  ge2 = NULL;
+			  cur = NULL;
 			  for(int j=0; j < edgeList.size(); j++)
 			  {
+				  
 				  cur = edgeList.at(j);
 				  if(cur== NULL)
 				  {
