@@ -138,15 +138,6 @@ BEGIN
     PUSHBUTTON      "Close",IDC_CLOSE,328,142,50,14
 END
 
-IDD_HELP_DLG DIALOGEX 0, 0, 186, 93
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_CAPTION | WS_SYSMENU
-CAPTION "Help"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,35,71,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,98,71,50,14
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -162,14 +153,6 @@ BEGIN
         RIGHTMARGIN, 388
         TOPMARGIN, 11
         BOTTOMMARGIN, 165
-    END
-
-    IDD_HELP_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 86
     END
 END
 #endif    // APSTUDIO_INVOKED

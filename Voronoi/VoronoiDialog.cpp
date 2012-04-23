@@ -76,7 +76,6 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_BN_CLICKED(IDC_UNDO_CURVES, &CVoronoiDialog::OnBnClickedUndoCurves)
 	ON_BN_CLICKED(IDC_CLEAR_POINTS, &CVoronoiDialog::OnBnClickedClearPoints)
 	ON_BN_CLICKED(IDC_BURN, &CVoronoiDialog::OnBnClickedBurn)
-	ON_BN_CLICKED(IDC_HELP, &CVoronoiDialog::OnBnClickedHelp)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_INDVSTRENGTH_SLIDER, &CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider)
 	ON_BN_CLICKED(IDC_TRIM, &CVoronoiDialog::OnBnClickedTrim)
 	ON_BN_CLICKED(IDC_UNDO_TRIM, &CVoronoiDialog::OnBnClickedUndoTrim)
@@ -282,12 +281,7 @@ void CVoronoiDialog::OnBnClickedBurn()
 	OnOK();
 }
 
-void CVoronoiDialog::OnBnClickedHelp()
-{
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	ON_wString cmd = L"! _HelpDlg ";
-	RhinoApp().RunScript( cmd , 0 );
-}
 
 void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult)
 {
