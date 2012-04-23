@@ -86,6 +86,7 @@ END_MESSAGE_MAP()
 
 void CVoronoiDialog::DisableAll()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	bool val = false;
 
 	attractor_AddPtAttractorButton.EnableWindow(val);
@@ -118,6 +119,7 @@ void CVoronoiDialog::DisableAll()
 
 void CVoronoiDialog::SetState(int state)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	DisableAll();
 	switch(state)
 	{
@@ -161,6 +163,7 @@ void CVoronoiDialog::SetState(int state)
 
 void CVoronoiDialog::OnBnClickedOk()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _RandomPoint ";
 	CString num;
 	points_NumPointEdit.GetWindowText(num);
@@ -176,6 +179,7 @@ void CVoronoiDialog::OnBnClickedOk()
 
 void CVoronoiDialog::OnBnClickedAddAttractor()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	// TODO: Add your control notification handler code here
 	ON_wString cmd = L"! _AddPtAttractor ";
 	CString num;
@@ -188,6 +192,7 @@ void CVoronoiDialog::OnBnClickedAddAttractor()
 
 void CVoronoiDialog::OnBnClickedDelattractor()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _DelPtAttractor ";
 
 	RhinoApp().RunScript( cmd , 0 );
@@ -195,6 +200,7 @@ void CVoronoiDialog::OnBnClickedDelattractor()
 
 void CVoronoiDialog::OnBnClickedAddcurve()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _AddCurveAttractor ";
 	CString num;
 	attractor_StrengthEdit.GetWindowText(num);
@@ -205,6 +211,7 @@ void CVoronoiDialog::OnBnClickedAddcurve()
 
 void CVoronoiDialog::OnBnClickedClear()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _ClearAll ";
 
 	RhinoApp().RunScript( cmd , 0 );
@@ -213,6 +220,7 @@ void CVoronoiDialog::OnBnClickedClear()
 
 void CVoronoiDialog::OnBnClickedViewedit()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _ViewEdit ";
 
 	RhinoApp().RunScript( cmd , 0 );
@@ -220,6 +228,7 @@ void CVoronoiDialog::OnBnClickedViewedit()
 
 void CVoronoiDialog::OnBnClickedCellGenerate()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _RunVoronoi ";
 	CString num;
 	voronoi_MinDistEdit.GetWindowText(num);
@@ -239,6 +248,7 @@ void CVoronoiDialog::OnBnClickedCellGenerate()
 
 void CVoronoiDialog::OnBnClickedShowhide()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _TogglePtHide ";
 	if(voronoi_DrawCellLines.GetState())
 		cmd += (LPCTSTR)"1";
@@ -250,6 +260,7 @@ void CVoronoiDialog::OnBnClickedShowhide()
 
 void CVoronoiDialog::OnBnClickedUndoCurves()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _UndoCurves ";
 	RhinoApp().RunScript( cmd , 0 );
 	SetState(VORONOI_GENERATION);
@@ -257,6 +268,7 @@ void CVoronoiDialog::OnBnClickedUndoCurves()
 
 void CVoronoiDialog::OnBnClickedClearPoints()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _UndoPoints ";
 	RhinoApp().RunScript( cmd , 0 );
 	SetState(POINT_GENERATION);
@@ -264,6 +276,7 @@ void CVoronoiDialog::OnBnClickedClearPoints()
 
 void CVoronoiDialog::OnBnClickedBurn()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _BurnData ";
 	RhinoApp().RunScript( cmd , 0 );
 	OnOK();
@@ -271,12 +284,14 @@ void CVoronoiDialog::OnBnClickedBurn()
 
 void CVoronoiDialog::OnBnClickedHelp()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _HelpDlg ";
 	RhinoApp().RunScript( cmd , 0 );
 }
 
 void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	int pos = attractor_strength_slider.GetPos();
 	CString num;
 	num.Format(_T("%d"), pos);
@@ -285,6 +300,7 @@ void CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESUL
 
 void CVoronoiDialog::OnBnClickedTrim()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _TrimBrep ";
 	RhinoApp().RunScript( cmd , 0 );
 	SetState(DONE);
@@ -292,12 +308,14 @@ void CVoronoiDialog::OnBnClickedTrim()
 
 void CVoronoiDialog::OnBnClickedUndoTrim()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	ON_wString cmd = L"! _UndoTrim ";
 	RhinoApp().RunScript( cmd , 0 );
 	SetState(TRIM);
 }
 void CVoronoiDialog::OnBnClickedClose()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	OnOK();
 }
 
