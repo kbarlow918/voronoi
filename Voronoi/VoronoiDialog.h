@@ -67,7 +67,6 @@ public:
 	afx_msg void OnBnClickedUndoCurves();
 	afx_msg void OnBnClickedClearPoints();
 	afx_msg void OnBnClickedBurn();
-	afx_msg void OnBnClickedHelp();
 	
 	CSliderCtrl attractor_strength_slider;
 	afx_msg void OnNMReleasedcaptureIndvstrengthSlider(NMHDR *pNMHDR, LRESULT *pResult);

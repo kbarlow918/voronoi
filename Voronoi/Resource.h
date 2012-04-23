@@ -12,7 +12,6 @@
 #define IDC_BUTTON1                     3000
 #define IDC_EDIT1                       3001
 #define IDC_OVERALLSTRENGTH             3002
-#define IDD_HELP_DLG                    3002
 #define IDC_STRENGTH_SLIDER             3002
 #define IDC_STRENGTH                    3003
 #define IDC_DELATTRACTOR                3004
@@ -22,7 +21,6 @@
 #define IDC_CHECK1                      3008
 #define IDC_CELL_LINES                  3008
 #define IDCLEAR2                        3009
-#define IDC_HELP                        3009
 #define IDC_VORONOI_MIN_DIST            3010
 #define IDC_INNER_CURVES                3011
 #define IDC_BURN                        3012
