@@ -26,12 +26,13 @@
 #define IDC_VORONOI_MIN_DIST            3010
 #define IDC_INNER_CURVES                3011
 #define IDC_BURN                        3012
+#define IDC_BURN2                       3013
+#define IDC_CLOSE                       3013
 #define IDC_AttractorStrengthLabel      3014
 #define IDC_NumPointsLabel              3015
 #define IDC_OverallStrengthLabel        3016
 #define IDC_MinDistLabel                3017
 #define IDC_CurveOffsetLabel            3018
-#define IDC_SLIDER2                     3021
 #define IDC_INDVSTRENGTH_SLIDER         3021
 
 // Next default values for new objects
