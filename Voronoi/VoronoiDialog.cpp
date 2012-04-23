@@ -80,6 +80,7 @@ BEGIN_MESSAGE_MAP(CVoronoiDialog, CDialog)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_INDVSTRENGTH_SLIDER, &CVoronoiDialog::OnNMReleasedcaptureIndvstrengthSlider)
 	ON_BN_CLICKED(IDC_TRIM, &CVoronoiDialog::OnBnClickedTrim)
 	ON_BN_CLICKED(IDC_UNDO_TRIM, &CVoronoiDialog::OnBnClickedUndoTrim)
+	ON_BN_CLICKED(IDC_CLOSE, &CVoronoiDialog::OnBnClickedClose)
 END_MESSAGE_MAP()
 
 
@@ -265,6 +266,7 @@ void CVoronoiDialog::OnBnClickedBurn()
 {
 	ON_wString cmd = L"! _BurnData ";
 	RhinoApp().RunScript( cmd , 0 );
+	OnOK();
 }
 
 void CVoronoiDialog::OnBnClickedHelp()
@@ -294,3 +296,8 @@ void CVoronoiDialog::OnBnClickedUndoTrim()
 	RhinoApp().RunScript( cmd , 0 );
 	SetState(TRIM);
 }
+void CVoronoiDialog::OnBnClickedClose()
+{
+	OnOK();
+}
+
