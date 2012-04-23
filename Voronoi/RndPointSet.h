@@ -16,6 +16,7 @@ public:
 	void BurnData(const CRhinoCommandContext& context);
 	void DeletePointAttractor( const CRhinoCommandContext& context );
 	void TrimBrep( const CRhinoCommandContext& context );
+	void UndoTrim( const CRhinoCommandContext& context );
 	bool EvaluateAttractorsManyVectors(const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength);
 	void ViewEdit( const CRhinoCommandContext& context );
 	void DrawPoints( const CRhinoCommandContext& context, unsigned int numPoints, double overallStrength );
@@ -37,6 +38,7 @@ private:
 	bool pointsHidden;
 	const ON_Surface* surface;
 	const ON_Brep* mainBrep;
+	CRhinoBrepObject* trimmedBrep;
 };
 
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2);

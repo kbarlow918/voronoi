@@ -12,6 +12,7 @@ RndPointSet::RndPointSet(void)
 	srand((unsigned int)time(NULL));
 	pointsHidden = true;
 	surface = NULL;
+	trimmedBrep = NULL;
 }
 
 RndPointSet::~RndPointSet(void)
@@ -565,17 +566,26 @@ void RndPointSet::TrimBrep( const CRhinoCommandContext& context )
 		}else
 		{
 		  RhinoApp().Print(L"split worked");
-		  context.m_doc.AddBrepObject(*split);
+		  trimmedBrep = context.m_doc.AddBrepObject(*split);
 		}
 		
 		
 	}
 	
 }
+
+void RndPointSet::UndoTrim( const CRhinoCommandContext& context )
+{
+	if(trimmedBrep != NULL)
+	{
+		context.m_doc.DeleteObject(trimmedBrep);
+		trimmedBrep = NULL;
+	}
+}
 int sortPoints(const ON_2dPoint* p1, const ON_2dPoint* p2)
 {
 	if (p1->x >= 0 && p2->x < 0)
-        return 1;
+        return -1;
     if (p1->x == 0 && p2->x == 0)
         return p1->y > p2->y;
 
@@ -778,6 +788,11 @@ void RndPointSet::BurnData(const CRhinoCommandContext& context)
 	points.clear();
 	cellLines.clear();
 	surfaceCurves.clear();
+	if(trimmedBrep != NULL)
+	{
+		context.m_doc.DeleteObject(trimmedBrep);
+		trimmedBrep = NULL;
+	}
 
 	context.m_doc.Redraw();
 
@@ -808,7 +823,11 @@ void RndPointSet::ClearAll(const CRhinoCommandContext& context)
 	{
 	  context.m_doc.DeleteObject(surfaceCurves.at(i));
 	}
-
+	if(trimmedBrep != NULL)
+	{
+		context.m_doc.DeleteObject(trimmedBrep);
+		trimmedBrep = NULL;
+	}
 	rndPoints.clear();
 	//cellBorderList.clear();
 	pointAttractors.clear();

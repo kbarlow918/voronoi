@@ -683,3 +683,41 @@ CRhinoCommand::result CCommandTrimBrep::RunCommand( const CRhinoCommandContext& 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN UndoTrim command
+//
+
+class CCommandUndoTrim : public CRhinoCommand
+{
+public:
+	CCommandUndoTrim() {}
+	~CCommandUndoTrim() {}
+	UUID CommandUUID()
+	{
+		// {33ED487-AC73-41F7-B658-CD030BA8F811}
+		static const GUID UndoTrimCommand_UUID =
+		{ 0x33ED487, 0xAC73, 0x41F7, { 0xB6, 0x58, 0xCD, 0x03, 0x0B, 0xA8, 0xF8, 0x11 } };
+		return UndoTrimCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"UndoTrim"; }
+	const wchar_t* LocalCommandName() { return L"UndoTrim"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+// The one and only CCommandUndoTrim object
+static class CCommandUndoTrim theUndoTrimCommand;
+
+CRhinoCommand::result CCommandUndoTrim::RunCommand( const CRhinoCommandContext& context )
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	theVoronoiCommand.mySet.UndoTrim(context);
+	return CRhinoCommand::success;
+}
+
+//
+// END UndoTrim command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
