@@ -49,8 +49,8 @@ VoronoiDiagramGenerator::VoronoiDiagramGenerator()
 
 VoronoiDiagramGenerator::~VoronoiDiagramGenerator()
 {
-	cleanup();
-	cleanupEdges();
+	//cleanup();
+	//cleanupEdges();
 
 	if(allMemoryList != 0)
 		delete allMemoryList;

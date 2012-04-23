@@ -591,58 +591,6 @@ CRhinoCommand::result CCommandBurnData::RunCommand( const CRhinoCommandContext& 
 //
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-//
-// BEGIN HelpDlg command
-//
-
-class CCommandHelpDlg : public CRhinoCommand
-{
-public:
-	CCommandHelpDlg() {}
-	~CCommandHelpDlg() {}
-	UUID CommandUUID()
-	{
-		// {2C70EA9D-A6CC-4635-81B3-53E2D071B10C}
-		static const GUID HelpDlgCommand_UUID =
-		{ 0x2C70EA9D, 0xA6CC, 0x4635, { 0x81, 0xB3, 0x53, 0xE2, 0xD0, 0x71, 0xB1, 0x0C } };
-		return HelpDlgCommand_UUID;
-	}
-	const wchar_t* EnglishCommandName() { return L"HelpDlg"; }
-	const wchar_t* LocalCommandName() { return L"HelpDlg"; }
-	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
-};
-
-// The one and only CCommandHelpDlg object
-static class CCommandHelpDlg theHelpDlgCommand;
-
-CRhinoCommand::result CCommandHelpDlg::RunCommand( const CRhinoCommandContext& context )
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	/*CVoronoiDialog *help = new CVoronoiDialog( theVoronoiCommand.m_dialog );
-	if( help->Create(IDD_HELP_DLG, theVoronoiCommand.m_dialog) )
-	{
-		//help->ShowWindow( SW_SHOW );
-		//help->UpdateWindow();
-		//help->SetFocus();
-	}*/
-
-	CVoronoiDialog *help = new CVoronoiDialog( CWnd::FromHandle(RhinoApp().MainWnd()) );
-	if( help->Create(IDD_HELP_DLG, CWnd::FromHandle(RhinoApp().MainWnd())) )
-	{
-		help->ShowWindow( SW_SHOW );
-		help->UpdateWindow();
-		help->SetFocus();
-	}
-	return CRhinoCommand::success;
-}
-
-//
-// END HelpDlg command
-//
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
