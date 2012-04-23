@@ -49,8 +49,8 @@ VoronoiDiagramGenerator::VoronoiDiagramGenerator()
 
 VoronoiDiagramGenerator::~VoronoiDiagramGenerator()
 {
-	cleanup();
-	cleanupEdges();
+	//cleanup();
+	//cleanupEdges();
 
 	if(allMemoryList != 0)
 		delete allMemoryList;
@@ -155,22 +155,22 @@ void VoronoiDiagramGenerator::CloseEdges()
 
 	qsort(bpls,south,sizeof(Point),EdgeCompare);
 	for(z=0; z<south; z++){bplt[q] = bpls[z]; q++;}	
-	free(bpls);
+	//free(bpls);
 
 	bplt[q] = southeast; q++;
 	qsort(bple,east,sizeof(Point),EdgeCompare);
 	for(z=0; z<east; z++) {bplt[q] = bple[z]; q++;}
-	free(bple);
+	//free(bple);
 
 	bplt[q] = northeast; q++;
 	qsort(bpln,north,sizeof(Point),EdgeCompare);
 	for(z=0; z<north; z++){bplt[q] = bpln[z]; q++;}
-	free(bpln);
+	//free(bpln);
 
 	bplt[q] = northwest; q++;
 	qsort(bplw,west,sizeof(Point),EdgeCompare);
 	for(z=0; z<west; z++) {bplt[q] = bplw[z]; q++;}			
-	free(bplw);
+	//free(bplw);
 
 	bplt[q] = southwest;
 	RhinoApp().Print(L"q: %d\n",q);
